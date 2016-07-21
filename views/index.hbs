@@ -1,0 +1,92 @@
+
+  <div class="container">
+  <div class="row">
+    <div class="col-sm-12">
+      <form  action="/timerecords/add" method="post">
+  <fieldset class="form-group">
+    <label for="duration">Wie lange:</label>
+    <select class="form-control c-select" id="duration" name="timerecord[duration]">
+      {{#each durations}}
+      <option value="{{this}}">{{this}}</option>
+      {{/each}}
+    </select>
+    <small class="text-muted">Dauer in Stunden.</small>
+  </fieldset>
+  <div class="form-group row">
+    <label for="date-month" class="col-sm-2 form-control-label">Wann?</label>
+    <div class="col-sm-2">
+      <input type="number" name="timerecord[month]" value="{{currentMonth}}" class="form-control" id="date-month" placeholder="">
+    </div>
+    <div class="col-sm-2">
+      <input type="number" name="timerecord[year]" value="{{currentYear}}" class="form-control" id="date-year" placeholder="">
+    </div>
+  </div>
+  <fieldset class="form-group">
+    <label for="categories">Was hast du gemacht?</label>
+    <select class="form-control c-select" id="categories" name="timerecord[category]">
+      {{#each categories}}
+      <option value="{{this}}">{{this}}</option>
+      {{/each}}
+    </select>
+  </fieldset>
+  <fieldset class="form-group">
+    <label for="working-groups">Welche AG?</label>
+    <select class="form-control c-select" id="working-groups" name="timerecord[workinggroup]">
+      {{#each workingGroups}}
+      <option value="{{this}}">{{this}}</option>
+      {{/each}}
+    </select>
+  </fieldset>
+  <fieldset class="form-group">
+    <label for="exampleTextarea">Beschreibung</label>
+    <textarea class="form-control" id="description" name="timerecord[description]" rows="3"></textarea>
+  </fieldset>
+  <button type="submit" class="btn btn-primary pull-right">Speichern</button>
+</form>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-12">
+      <br/>
+      <table class="table table-striped">
+  <thead class="thead-inverse">
+    <tr>
+      <th></th>
+      <th>Bewohner*in</th>
+      <th>Dauer</th>
+      <th>Kategorie</th>
+      <th>AG</th>
+      <th>Beschreibung</th>
+      <th>Jahr</th>
+      <th>Monat</th>
+    </tr>
+  </thead>
+  <tbody>
+      {{#each timeRecords}}
+    <tr>
+      <td scope="row">
+        <form action="/timerecords/{{this.id}}/delete" method="post">
+        <input type="hidden" name="id" value="{{this.id}}"/>
+          <button type="submit" class="btn btn-danger">
+            <i class="fa fa-trash" aria-hidden="true"></i>
+          </button>
+        </form>
+      </td>
+      <td>{{this.userName}}</td>
+      <td>{{this.duration}}</td>
+      <td>{{this.category}}</td>
+      <td>{{this.workingGroup}}</td>
+      <td>{{this.description}}</td>
+      <td>{{this.year}}</td>
+      <td>{{this.month}}</td>
+    </tr>
+    {{/each}}
+  </tbody>
+</table>
+    </div>
+  </div>
+</div>
+  
+  
+  
+  
