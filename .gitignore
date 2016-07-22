@@ -39,3 +39,4 @@ jspm_packages
 # service accout key
 config/service_account_key.json
 .env
+sessions

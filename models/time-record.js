@@ -1,5 +1,5 @@
 var TimeRecord = class TimeRecord {
-  constructor(id, email, userName, duration, category, workingGroup, description, year, month) {
+  constructor(id, email, userName, duration, category, workingGroup, description, year, month, day) {
     this.id = id;
     this.email = email;
     this.userName = userName;
@@ -9,6 +9,7 @@ var TimeRecord = class TimeRecord {
     this.description = description;
     this.year = year;
     this.month = month;
+    this.day = day;
   }
 };
 

@@ -13,12 +13,15 @@
     <small class="text-muted">Dauer in Stunden.</small>
   </fieldset>
   <div class="form-group row">
-    <label for="date-month" class="col-sm-2 form-control-label">Wann?</label>
-    <div class="col-sm-2">
-      <input type="number" name="timerecord[month]" value="{{currentMonth}}" class="form-control" id="date-month" placeholder="">
+    <label for="date-month" class="col-sm-3 form-control-label">Wann?[Tag-Monat-Jahr]</label>
+    <div class="col-sm-3">
+      <input type="number" name="timerecord[day]" value="{{currentDay}}" class="form-control" id="date-year" placeholder="Tag">
     </div>
-    <div class="col-sm-2">
-      <input type="number" name="timerecord[year]" value="{{currentYear}}" class="form-control" id="date-year" placeholder="">
+    <div class="col-sm-3">
+      <input type="number" name="timerecord[month]" value="{{currentMonth}}" class="form-control" id="date-month" placeholder="Monat">
+    </div>
+    <div class="col-sm-3">
+      <input type="number" name="timerecord[year]" value="{{currentYear}}" class="form-control" id="date-year" placeholder="Jahr">
     </div>
   </div>
   <fieldset class="form-group">
@@ -59,6 +62,7 @@
       <th>Beschreibung</th>
       <th>Jahr</th>
       <th>Monat</th>
+      <th>Tag</th>
     </tr>
   </thead>
   <tbody>
@@ -79,6 +83,7 @@
       <td>{{this.description}}</td>
       <td>{{this.year}}</td>
       <td>{{this.month}}</td>
+      <td>{{this.day}}</td>
     </tr>
     {{/each}}
   </tbody>

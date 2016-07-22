@@ -107,14 +107,15 @@ app.get('/timerecords',
         workingGroups: values[0],
         categories: values[1],
         durations: values[2],
+        currentDay: new Date().getDate(),
         currentMonth: new Date().getMonth() + 1,
         currentYear: new Date().getFullYear(),
         timeRecords: _.orderBy(values[3], record => {
           const y = record.year;
           const m = record.month - 1;
-          const d = 1;
+          const d = record.day;
           
-          return new Date(y, m, 1)
+          return new Date(y, m, d)
         }, "desc")
       })
     });
@@ -139,8 +140,9 @@ app.post('/timerecords/add',
     const description = req.body.timerecord.description;
     const year = req.body.timerecord.year;
     const month = req.body.timerecord.month;
+    const day = req.body.timerecord.day;
 
-    const newRecord = new TimeRecord(id, email, username, duration, category, workinggroup, description, year, month);
+    const newRecord = new TimeRecord(id, email, username, duration, category, workinggroup, description, year, month, day);
     repo.addNewTimeRecord(newRecord).then(() => res.redirect("/timerecords"));
   });
 

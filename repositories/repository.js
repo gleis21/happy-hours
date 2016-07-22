@@ -69,7 +69,7 @@ function getTimeRecordsByEmail(email) {
   return authenticate(doc)
     .then((d) => getSheet(d, 0))
     .then(sheet => getRowsByColumn(sheet, "email", email, "="))
-    .then(rows => rows.map(r => new TimeRecord(r.id, r.email, r.username, r.duration, r.category, r.workinggroup, r.description, r.year, r.month)));
+    .then(rows => rows.map(r => new TimeRecord(r.id, r.email, r.username, r.duration, r.category, r.workinggroup, r.description, r.year, r.month, r.day)));
 }
 
 function getWorkingGroups() {
