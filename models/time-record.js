@@ -1,6 +1,6 @@
 var TimeRecord = class TimeRecord {
   constructor(id, email, userName, duration, category, workingGroup, description, year, month, day) {
-    this.id = id;
+    this.guid = id;
     this.email = email;
     this.userName = userName;
     this.duration = duration;
