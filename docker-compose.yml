@@ -5,7 +5,9 @@ services:
         expose:
             - "3000"
         volumes:
-            - .:/usr/src/app
+            - ./config:/usr/src/app/config
+            - ./sessions:/usr/src/app/sessions
+            - ./logs:/usr/src/app/logs
     proxy:
         image: zzrot/alpine-caddy
         ports:

@@ -4,6 +4,7 @@ RUN npm install -g pm2
 
 # Create app directory
 RUN mkdir -p /usr/src/app
+RUN mkdir -p /usr/src/app/logs
 WORKDIR /usr/src/app
 
 # Install app dependencies

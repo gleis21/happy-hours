@@ -3,7 +3,7 @@
 /**
  * Module dependencies.
  */
-require('dotenv').config();
+require('dotenv').config({path: './config/.env'});
 var app = require('../app');
 var debug = require('debug')('happy-hours:server');
 var http = require('http');

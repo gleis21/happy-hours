@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 const favicon = require('serve-favicon');
-const logger = require('morgan');
+const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const passport = require('passport');
@@ -13,6 +13,8 @@ const FileStore = require('session-file-store')(session);
 const ensureAuth = require('connect-ensure-login');
 const uuid = require("node-uuid");
 const _ = require("lodash");
+const helmet = require('helmet')
+const fs = require("fs");
 
 // Configure the Facebook strategy for use by Passport.
 //
@@ -62,11 +64,15 @@ app.set('view engine', 'hbs');
 
 // Use application-level middleware for common functionality, including
 // logging, parsing, and session handling.
-app.use(require('morgan')('combined'));
+// create a write stream (in append mode)
+const accessLogStream = fs.createWriteStream(path.join(__dirname, './logs/access.log'), {flags: 'a'})
+
+app.use(helmet())
+app.use(morgan('combined', {stream: accessLogStream}));
 app.use(require('cookie-parser')());
 app.use(require('body-parser').urlencoded({ extended: true }));
 app.use(session({
-  store: new FileStore,
+  store: new FileStore(),
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,

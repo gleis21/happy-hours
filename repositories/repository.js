@@ -69,7 +69,7 @@ function getTimeRecordsByEmail(email) {
   return authenticate(doc)
     .then((d) => getSheet(d, 0))
     .then(sheet => getRowsByColumn(sheet, "email", email, "="))
-    .then(rows => rows.map(r => new TimeRecord(r.id, r.email, r.username, r.duration, r.category, r.workinggroup, r.description, r.year, r.month, r.day)));
+    .then(rows => rows.map(r => new TimeRecord(r.guid, r.email, r.username, r.duration, r.category, r.workinggroup, r.description, r.year, r.month, r.day)));
 }
 
 function getWorkingGroups() {
@@ -96,7 +96,7 @@ function getDurations() {
 function deleteRowById(id) {
   return authenticate(doc)
     .then(d => getSheet(d, 0))
-    .then(sheet => getRowsByColumn(sheet, "id", id, "="))
+    .then(sheet => getRowsByColumn(sheet, "guid", id, "="))
     .then(rows => {
       if (rows.length !== 1) throw new Error("More then one element with id: " + id)
       deleteRow(rows[0]);
