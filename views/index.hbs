@@ -69,7 +69,7 @@
       {{#each timeRecords}}
     <tr>
       <td scope="row">
-        <form action="/timerecords/{{this.id}}/delete" method="post">
+        <form action="/timerecords/{{this.guid}}/delete" method="post">
         <input type="hidden" name="id" value="{{this.guid}}"/>
           <button type="submit" class="btn btn-danger">
             <i class="fa fa-trash" aria-hidden="true"></i>
