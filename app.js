@@ -76,7 +76,7 @@ app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: {}
+  cookie: {secure: true}
 }));
 
 // Initialize Passport and restore authentication state, if any, from the

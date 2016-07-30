@@ -109,18 +109,6 @@ function addNewTimeRecord(record) {
     .then(sheet => addRow(sheet, record));
 }
 
-/*
-getTimeRecordsByEmail("p.marcinkowski83@gmail.com")
-                         .then(r => r.forEach(x => console.log(x)));
-getWorkingGroups().then(r => r.forEach(x => console.log(x)));
-getCategories().then(r => r.forEach(x => console.log(x)));
-
-
-deleteRowById("110ec58a-a0f2-4ac4-8393-c866d813b8d12")
-.then(() => console.log("ok")).catch(err => console.log(err));
-
-getAuthorizedEmailAccounts().then((x) => console.log(x.find(e => e === "p.marcinkowski83@gmail.com"))).catch(err => console.log(err));
- */
 module.exports = {
   getAuthorizedEmailAccounts: getAuthorizedEmailAccounts,
   getTimeRecordsByEmail: getTimeRecordsByEmail,
