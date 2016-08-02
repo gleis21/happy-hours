@@ -1,7 +1,7 @@
 version: '2'
 services:
     happy-hours:
-        build: .
+        image: gleis21/happy-hours
         restart: on-failure:10
         expose:
             - "3000"
@@ -15,6 +15,6 @@ services:
             -   "80:80"
             -   "443:443"
         volumes:
-            -   ./Caddyfile:/etc/Caddyfile
+            -   ./config/Caddyfile:/etc/Caddyfile
             -   ./.caddy:/root/.caddy
             -   ./public:/var/www/html

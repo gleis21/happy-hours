@@ -14,6 +14,6 @@ services:
         ports:
             -   "3000:3000"
         volumes:
-            -   ./Caddyfile:/etc/Caddyfile
+            -   ./config/Caddyfile.dev:/etc/Caddyfile
             -   ./.caddy:/root/.caddy
             -   ./public:/var/www/html
