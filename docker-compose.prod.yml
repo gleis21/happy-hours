@@ -1,7 +1,6 @@
 version: '2'
 services:
     happy-hours:
-        image: gleis21/happy-hours
         restart: on-failure:10
         expose:
             - "3000"

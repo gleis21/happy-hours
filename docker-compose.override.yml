@@ -1,0 +1,16 @@
+version: '2'
+services:
+    happy-hours:
+        build: .
+        expose:
+            - "3000"
+        volumes:
+            - .:/usr/src/app
+    proxy:
+        image: zzrot/alpine-caddy
+        ports:
+            -   "3000:3000"
+        volumes:
+            - ./config/Caddyfile.dev:/etc/Caddyfile
+            - ./.caddy:/root/.caddy
+            - ./public:/var/www/html
