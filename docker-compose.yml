@@ -1,6 +1,6 @@
 version: '2'
 services:
     happy-hours:
-        image: gleis21/happy-hours:lates
+        image: gleis21/happy-hours:latest
     proxy:
         image: zzrot/alpine-caddy
