@@ -12,7 +12,7 @@ const session = require('express-session');
 const FileStore = require('session-file-store')(session);
 const ensureAuth = require('connect-ensure-login');
 const uuid = require("node-uuid");
-const _ = require("lodash");
+const timerecordService = require("./services/timerecords");
 const helmet = require('helmet')
 const fs = require("fs");
 
@@ -116,13 +116,7 @@ app.get('/timerecords',
         currentDay: new Date().getDate(),
         currentMonth: new Date().getMonth() + 1,
         currentYear: new Date().getFullYear(),
-        timeRecords: _.orderBy(values[3], record => {
-          const y = record.year;
-          const m = record.month - 1;
-          const d = record.day;
-          
-          return new Date(y, m, d)
-        }, "desc")
+        timeRecords: timerecordService.getGroupedByMonth(values[3])
       })
     });
   });

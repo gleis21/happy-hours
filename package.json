@@ -3,10 +3,12 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "test": "./node_modules/.bin/mocha --reporter spec"
   },
   "dependencies": {
     "body-parser": "~1.15.1",
+    "chai": "^3.5.0",
     "connect-ensure-login": "^0.1.1",
     "cookie-parser": "~1.4.3",
     "debug": "~2.2.0",
@@ -17,6 +19,7 @@
     "hbs": "^4.0.0",
     "helmet": "^2.1.2",
     "lodash": "^4.13.1",
+    "mocha": "^3.0.0",
     "morgan": "~1.7.0",
     "node-uuid": "^1.4.7",
     "passport": "^0.3.2",
