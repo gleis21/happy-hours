@@ -40,3 +40,5 @@ jspm_packages
 config/service_account_key.json
 .env
 sessions
+.vscode
+.caddy

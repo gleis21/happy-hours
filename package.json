@@ -10,6 +10,7 @@
     "body-parser": "~1.15.1",
     "chai": "^3.5.0",
     "connect-ensure-login": "^0.1.1",
+    "connect-redis": "^3.1.0",
     "cookie-parser": "~1.4.3",
     "debug": "~2.2.0",
     "dotenv": "^2.0.0",
@@ -24,7 +25,12 @@
     "node-uuid": "^1.4.7",
     "passport": "^0.3.2",
     "passport-google-oauth20": "^1.0.0",
-    "serve-favicon": "~2.3.0",
-    "session-file-store": "^0.2.0"
+    "redis": "^2.6.2"
+  },
+  "devDependencies": {
+    "eslint": "^3.2.2",
+    "eslint-config-standard": "^5.3.5",
+    "eslint-plugin-promise": "^2.0.0",
+    "eslint-plugin-standard": "^2.0.0"
   }
 }
