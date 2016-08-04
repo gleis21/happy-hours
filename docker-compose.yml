@@ -2,5 +2,9 @@ version: '2'
 services:
     happy-hours:
         image: gleis21/happy-hours:latest
+        links:
+            - redis
     proxy:
         image: zzrot/alpine-caddy
+    redis:
+        image: redis:alpine
