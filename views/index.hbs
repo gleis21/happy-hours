@@ -1,5 +1,5 @@
 
-  <div class="container">
+  <div class="container-fluid">
     <div class="text-xs-center">
     <img src="/img/logo.png" class="" alt="Gleis 21" width="200">
     </div>
@@ -61,6 +61,7 @@
           <strong>Wow!</strong> Du hast in dem Monat ganze <strong>{{this.durationSum}}</strong> Stunden gemacht!
         </div>
       <br/>
+      <div class="table-responsive">
       <table class="table table-striped">
         <thead class="thead-inverse">
           <tr>
@@ -98,6 +99,7 @@
           {{/each}}
             </tbody>
       </table>  
+      </div>
       </div>
     {{/each}}
 
