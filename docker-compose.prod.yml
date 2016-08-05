@@ -6,7 +6,6 @@ services:
             - "3000"
         volumes:
             - ./config:/usr/src/app/config
-            - ./sessions:/usr/src/app/sessions
             - ./logs:/usr/src/app/logs
     proxy:
         image: zzrot/alpine-caddy
