@@ -15,7 +15,7 @@ const helmet = require('helmet')
 const fs = require('fs')
 const redis = require('redis')
 const RedisStore = require('connect-redis')(session)
-const clearCacheMiddlewareFactory = require('./middleware/clear-cache')
+const cacheMiddlewareFactory = require('./middleware/cache')
 
 passport.use(new Strategy({
   clientID: process.env.CLIENT_ID,
@@ -38,7 +38,8 @@ passport.deserializeUser(function (obj, cb) {
   cb(null, obj)
 })
 const redisClient = redis.createClient({ host: 'redis' })
-const clearCacheMiddleware = clearCacheMiddlewareFactory(redisClient)
+const cacheMiddleware = cacheMiddlewareFactory(redisClient)
+
 // Create a new Express application.
 var app = express()
 
@@ -82,42 +83,37 @@ app.get('/auth/google/callback',
 
 app.get('/timerecords',
   ensureAuth.ensureLoggedIn('/'),
+  cacheMiddleware.getIfExists,
   function (req, res) {
-    const email = req.user.emails[0].value
-    redisClient.exists(email, (err, exists) => {
-      if (err || !exists) {
-        const getTimeRecords = repo.getTimeRecordsByEmail(req.user.emails[0].value)
-        const getWorkingGroups = repo.getWorkingGroups()
-        const getCategories = repo.getCategories()
-        const getDurations = repo.getDurations()
-        Promise.all([getWorkingGroups, getCategories, getDurations, getTimeRecords]).then(values => {
-          const model = {
-            workingGroups: values[0],
-            categories: values[1],
-            durations: values[2],
-            currentDay: new Date().getDate(),
-            currentMonth: new Date().getMonth() + 1,
-            currentYear: new Date().getFullYear(),
-            timeRecords: timerecordService.getGroupedByMonth(values[3])
-          }
+    if (req.cachedData) {
+      const model = req.cachedData
+      res.render('index', model)
+    } else {
+      const email = req.user.emails[0].value
+      const getTimeRecords = repo.getTimeRecordsByEmail(req.user.emails[0].value)
+      const getWorkingGroups = repo.getWorkingGroups()
+      const getCategories = repo.getCategories()
+      const getDurations = repo.getDurations()
+      Promise.all([getWorkingGroups, getCategories, getDurations, getTimeRecords]).then(values => {
+        const model = {
+          workingGroups: values[0],
+          categories: values[1],
+          durations: values[2],
+          currentDay: new Date().getDate(),
+          currentMonth: new Date().getMonth() + 1,
+          currentYear: new Date().getFullYear(),
+          timeRecords: timerecordService.getGroupedByMonth(values[3])
+        }
 
-          redisClient.setnx(email, JSON.stringify(model))
-          res.render('index', model)
-        })
-      } else {
-        redisClient.get(email, (err, data) => {
-          if (!err) {
-            const model = JSON.parse(data)
-            res.render('index', model)
-          }
-        })
-      }
-    })
+        redisClient.setnx(email, JSON.stringify(model))
+        res.render('index', model)
+      })
+    }
   })
 
 app.post('/timerecords/:id/delete',
   ensureAuth.ensureLoggedIn('/'),
-  clearCacheMiddleware,
+  cacheMiddleware.clear,
   function (req, res) {
     const id = req.body.id
     repo.deleteRowById(id).then(() => res.redirect('/timerecords'))
@@ -125,7 +121,7 @@ app.post('/timerecords/:id/delete',
 
 app.post('/timerecords/add',
   ensureAuth.ensureLoggedIn('/'),
-  clearCacheMiddleware,
+  cacheMiddleware.clear,
   function (req, res) {
     const id = uuid.v4().toString()
     const email = req.user.emails[0].value
