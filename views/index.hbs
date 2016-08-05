@@ -1,112 +1,105 @@
-
-  <div class="container-fluid">
-    <div class="text-xs-center">
+<div class="container-fluid">
+  <div class="text-xs-center">
     <img src="/img/logo.png" class="" alt="Gleis 21" width="200">
-    </div>
+  </div>
   <div class="row">
     <div class="col-sm-12">
-      <form  action="/timerecords/add" method="post">
-  <fieldset class="form-group">
-    <label for="duration">Wie lange:</label>
-    <select class="form-control c-select" id="duration" name="timerecord[duration]">
+      <form action="/timerecords/add" method="post">
+        <fieldset class="form-group">
+          <label for="duration">Wie lange:</label>
+          <select class="form-control c-select" id="duration" name="timerecord[duration]">
       {{#each durations}}
       <option value="{{this}}">{{this}}</option>
       {{/each}}
     </select>
-    <small class="text-muted">Dauer in Stunden.</small>
-  </fieldset>
-  <div class="form-group row">
-    <label for="date-month" class="col-sm-3 form-control-label">Wann? [Tag-Monat-Jahr]</label>
-    <div class="col-sm-3">
-      <input type="number" name="timerecord[day]" min="1" max="31" value="{{currentDay}}" class="form-control" id="date-year" placeholder="Tag">
-    </div>
-    <div class="col-sm-3">
-      <input type="number" name="timerecord[month]" min="1" max="12" value="{{currentMonth}}" class="form-control" id="date-month" placeholder="Monat">
-    </div>
-    <div class="col-sm-3">
-      <input type="number" name="timerecord[year]" min="{{currentYear - 1}}" max="{{currentYear}}" value="{{currentYear}}" class="form-control" id="date-year" placeholder="Jahr">
-    </div>
-  </div>
-  <fieldset class="form-group">
-    <label for="categories">Was hast du gemacht?</label>
-    <select class="form-control c-select" id="categories" name="timerecord[category]">
+          <small class="text-muted">Dauer in Stunden.</small>
+        </fieldset>
+        <div class="form-group row">
+          <label for="date-month" class="col-sm-3 form-control-label">Wann? [Tag-Monat-Jahr]</label>
+          <div class="col-sm-3">
+            <input type="number" name="timerecord[day]" min="1" max="31" value="{{currentDay}}" class="form-control" id="date-year" placeholder="Tag">
+          </div>
+          <div class="col-sm-3">
+            <input type="number" name="timerecord[month]" min="1" max="12" value="{{currentMonth}}" class="form-control" id="date-month" placeholder="Monat">
+          </div>
+          <div class="col-sm-3">
+            <input type="number" name="timerecord[year]" min="{{currentYear - 1}}" max="{{currentYear}}" value="{{currentYear}}" class="form-control" id="date-year" placeholder="Jahr">
+          </div>
+        </div>
+        <fieldset class="form-group">
+          <label for="categories">Was hast du gemacht?</label>
+          <select class="form-control c-select" id="categories" name="timerecord[category]">
       {{#each categories}}
       <option value="{{this}}">{{this}}</option>
       {{/each}}
     </select>
-  </fieldset>
-  <fieldset class="form-group">
-    <label for="working-groups">Für welche AG?</label>
-    <select class="form-control c-select" id="working-groups" name="timerecord[workinggroup]">
+        </fieldset>
+        <fieldset class="form-group">
+          <label for="working-groups">Für welche AG?</label>
+          <select class="form-control c-select" id="working-groups" name="timerecord[workinggroup]">
       {{#each workingGroups}}
       <option value="{{this}}">{{this}}</option>
       {{/each}}
     </select>
-  </fieldset>
-  <fieldset class="form-group">
-    <label for="exampleTextarea">Und wenn du genau sein willst...</label>
-    <textarea class="form-control" id="description" name="timerecord[description]" rows="3"></textarea>
-  </fieldset>
-  <button type="submit" class="btn btn-primary pull-right">Speichern</button>
-</form>
+        </fieldset>
+        <fieldset class="form-group">
+          <label for="exampleTextarea">Und wenn du genau sein willst...</label>
+          <textarea class="form-control" id="description" name="timerecord[description]" rows="3"></textarea>
+        </fieldset>
+        <button type="submit" class="btn btn-primary pull-right">Speichern</button>
+      </form>
     </div>
   </div>
   <div class="row">
     <div class="col-sm-12">
-      <br/>
-      
-      {{#each timeRecords}}
+      <br/> {{#each timeRecords}}
       <div class="card card-block">
         <div class="alert alert-success" role="alert">
           <strong>Wow!</strong> Du hast in dem Monat ganze <strong>{{this.durationSum}}</strong> Stunden gemacht!
         </div>
-      <br/>
-      <div class="table-responsive">
-      <table class="table table-striped">
-        <thead class="thead-inverse">
-          <tr>
-            <th></th>
-            <th>Bewohner*in</th>
-            <th>Dauer</th>
-            <th>Kategorie</th>
-            <th>AG</th>
-            <th>Beschreibung</th>
-            <th>Jahr</th>
-            <th>Monat</th>
-            <th>Tag</th>
-          </tr>
-        </thead>
-        <tbody>
-          {{#each this.records}}
-          <tr>
-            <td scope="row">
-              <form action="/timerecords/{{this.guid}}/delete" method="post">
-              <input type="hidden" name="id" value="{{this.guid}}"/>
-                <button type="submit" class="btn btn-danger">
+        <br/>
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead class="thead-inverse">
+              <tr>
+                <th></th>
+                <th>Bewohner*in</th>
+                <th>Dauer</th>
+                <th>Kategorie</th>
+                <th>AG</th>
+                <th>Beschreibung</th>
+                <th>Jahr</th>
+                <th>Monat</th>
+                <th>Tag</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each this.records}}
+              <tr>
+                <td scope="row">
+                  <form action="/timerecords/{{this.guid}}/delete" method="post">
+                    <input type="hidden" name="id" value="{{this.guid}}" />
+                    <button type="submit" class="btn btn-danger">
                   <i class="fa fa-trash" aria-hidden="true"></i>
                 </button>
-              </form>
-            </td>
-            <td>{{this.userName}}</td>
-            <td>{{this.duration}}</td>
-            <td>{{this.category}}</td>
-            <td>{{this.workingGroup}}</td>
-            <td>{{this.description}}</td>
-            <td>{{this.year}}</td>
-            <td>{{this.month}}</td>
-            <td>{{this.day}}</td>
-          </tr>
-          {{/each}}
+                  </form>
+                </td>
+                <td>{{this.userName}}</td>
+                <td>{{this.duration}}</td>
+                <td>{{this.category}}</td>
+                <td>{{this.workingGroup}}</td>
+                <td>{{this.description}}</td>
+                <td>{{this.year}}</td>
+                <td>{{this.month}}</td>
+                <td>{{this.day}}</td>
+              </tr>
+              {{/each}}
             </tbody>
-      </table>  
+          </table>
+        </div>
       </div>
-      </div>
-    {{/each}}
+      {{/each}}
 
     </div>
   </div>
 </div>
-  
-  
-  
-  
