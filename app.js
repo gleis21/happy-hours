@@ -98,7 +98,7 @@ app.get('/auth/google/callback',
 app.get('/timerecords',
   ensureAuth.ensureLoggedIn('/'),
   cacheMiddleware.getIfExists,
-  function (req, res) {
+  function (req, res, next) {
     if (req.cachedData) {
       const model = req.cachedData
       res.render('index', model)
@@ -107,22 +107,22 @@ app.get('/timerecords',
       timerecordService.getMainModel(email).then((model) => {
         redisClient.setnx(email, JSON.stringify(model))
         res.render('index', model)
-      })
+      }).catch(e => next(e))
     }
   })
 
 app.post('/timerecords/:id/delete',
   ensureAuth.ensureLoggedIn('/'),
   cacheMiddleware.clear,
-  function (req, res) {
+  function (req, res, next) {
     const id = req.body.id
-    repo.deleteRowById(id).then(() => res.redirect('/timerecords'))
+    repo.deleteRowById(id).then(() => res.redirect('/timerecords')).catch(e => next(e))
   })
 
 app.post('/timerecords/add',
   ensureAuth.ensureLoggedIn('/'),
   cacheMiddleware.clear,
-  function (req, res) {
+  function (req, res, next) {
     const id = uuid.v4().toString()
     const email = req.user.emails[0].value
     const username = req.user.displayName
@@ -135,7 +135,7 @@ app.post('/timerecords/add',
     const day = req.body.timerecord.day
 
     const newRecord = new TimeRecord(id, email, username, duration, category, workinggroup, description, year, month, day)
-    repo.addNewTimeRecord(newRecord).then(() => res.redirect('/timerecords'))
+    repo.addNewTimeRecord(newRecord).then(() => res.redirect('/timerecords')).catch(e => next(e))
   })
 
 // error handlers
