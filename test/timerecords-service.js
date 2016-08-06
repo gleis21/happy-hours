@@ -1,5 +1,6 @@
-var expect = require('chai').expect
-var timerecordsService = require('../services/timerecords')
+const expect = require('chai').expect
+const repoMock = {}
+const timerecordsService = require('../services/timerecords')(repoMock)
 const TimeRecord = require('../models/time-record').TimeRecord
 
 describe('Timerecords Service', function () {
