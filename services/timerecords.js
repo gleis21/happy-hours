@@ -1,4 +1,5 @@
 const _ = require('lodash')
+const repo = require('../repositories/repository')
 
 function getGroupedByMonth (timerecords) {
   const recordsGroupedByMonth = _.groupBy(timerecords, record => {
@@ -25,6 +26,28 @@ function getGroupedByMonth (timerecords) {
   return _.orderBy(res, x => { return new Date(x.monthDate) }, 'desc')
 }
 
+function getMainModel (email) {
+  return new Promise((resolve, reject) => {
+    const getTimeRecords = repo.getTimeRecordsByEmail(email)
+    const getWorkingGroups = repo.getWorkingGroups()
+    const getCategories = repo.getCategories()
+    const getDurations = repo.getDurations()
+    Promise.all([getWorkingGroups, getCategories, getDurations, getTimeRecords]).then(values => {
+      const model = {
+        workingGroups: values[0],
+        categories: values[1],
+        durations: values[2],
+        currentDay: new Date().getDate(),
+        currentMonth: new Date().getMonth() + 1,
+        currentYear: new Date().getFullYear(),
+        timeRecords: getGroupedByMonth(values[3])
+      }
+      resolve(model)
+    })
+  })
+}
+
 module.exports = {
+  getMainModel: getMainModel,
   getGroupedByMonth: getGroupedByMonth
 }

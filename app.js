@@ -37,7 +37,9 @@ passport.serializeUser(function (user, cb) {
 passport.deserializeUser(function (obj, cb) {
   cb(null, obj)
 })
-const redisClient = redis.createClient({ host: 'redis' })
+const redisClient = redis.createClient({
+  host: 'redis'
+})
 const cacheMiddleware = cacheMiddlewareFactory(redisClient)
 
 // Create a new Express application.
@@ -46,14 +48,22 @@ var app = express()
 app.set('views', path.join(__dirname, '/views'))
 app.set('view engine', 'hbs')
 
-const accessLogStream = fs.createWriteStream(path.join(__dirname, './logs/access.log'), { flags: 'a' })
+const accessLogStream = fs.createWriteStream(path.join(__dirname, './logs/access.log'), {
+  flags: 'a'
+})
 
 app.use(helmet())
-app.use(morgan('combined', { stream: accessLogStream }))
+app.use(morgan('combined', {
+  stream: accessLogStream
+}))
 app.use(cookieParser())
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.urlencoded({
+  extended: true
+}))
 app.use(session({
-  store: new RedisStore({ client: redisClient }),
+  store: new RedisStore({
+    client: redisClient
+  }),
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
@@ -72,10 +82,14 @@ app.get('/', function (req, res, next) {
 })
 
 app.get('/auth/google',
-  passport.authenticate('google', { scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email' }))
+  passport.authenticate('google', {
+    scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email'
+  }))
 
 app.get('/auth/google/callback',
-  passport.authenticate('google', { failureRedirect: '/' }),
+  passport.authenticate('google', {
+    failureRedirect: '/'
+  }),
   function (req, res) {
     // Successful authentication, redirect home.
     res.redirect('/timerecords')
@@ -90,21 +104,7 @@ app.get('/timerecords',
       res.render('index', model)
     } else {
       const email = req.user.emails[0].value
-      const getTimeRecords = repo.getTimeRecordsByEmail(req.user.emails[0].value)
-      const getWorkingGroups = repo.getWorkingGroups()
-      const getCategories = repo.getCategories()
-      const getDurations = repo.getDurations()
-      Promise.all([getWorkingGroups, getCategories, getDurations, getTimeRecords]).then(values => {
-        const model = {
-          workingGroups: values[0],
-          categories: values[1],
-          durations: values[2],
-          currentDay: new Date().getDate(),
-          currentMonth: new Date().getMonth() + 1,
-          currentYear: new Date().getFullYear(),
-          timeRecords: timerecordService.getGroupedByMonth(values[3])
-        }
-
+      timerecordService.getMainModel(email).then((model) => {
         redisClient.setnx(email, JSON.stringify(model))
         res.render('index', model)
       })
