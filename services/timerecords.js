@@ -43,7 +43,7 @@ function getMainModel (email) {
         timeRecords: getGroupedByMonth(values[3])
       }
       resolve(model)
-    })
+    }).catch(e => reject(e))
   })
 }
 
