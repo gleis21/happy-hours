@@ -1,7 +1,11 @@
-const expect = require('chai').expect
+const chai = require('chai')
+const chaiAsPromised = require('chai-as-promised')
+const expect = chai.expect
 const repoMock = {}
 const timerecordsService = require('../services/timerecords')(repoMock)
 const TimeRecord = require('../models/time-record').TimeRecord
+
+chai.use(chaiAsPromised)
 
 describe('Timerecords Service', function () {
   describe('grouping timerecords by date', function () {
@@ -31,6 +35,35 @@ describe('Timerecords Service', function () {
 
       expect(res[0].durationSum).to.equal(8.5)
       expect(res[1].durationSum).to.equal(10)
+    })
+  })
+
+  describe('getting the main page model', function () {
+    it('combines all the data into a single object', function () {
+      const r1 = new TimeRecord('guid1', 'mail1@ds.dsf', 'firstname1 lastname1', 4, 'category1', 'working group 1', 'bla1', 2016, 6, 1)
+      const r2 = new TimeRecord('guid2', 'mail1@ds.dsf', 'firstname2 lastname2', 5, 'category2', 'working group 2', 'bla2', 2016, 8, 1)
+      const r3 = new TimeRecord('guid3', 'mail2@ds.dsf', 'firstname3 lastname3', 5, 'category2', 'working group 2', 'bla2', 2016, 8, 1)
+      const timerecords = [r1, r2, r3]
+      const wgs = [{wg: 'working group 1'}, {wg: 'working group 2'}]
+      const cas = [{ca: 'category1'}, {ca: 'category2'}]
+      const durs = [{duration: 1}, {duration: 2}]
+
+      repoMock.getTimeRecordsByEmail = (email) => { return new Promise((resolve, reject) => { resolve(timerecords) }) }
+      repoMock.getWorkingGroups = () => { return new Promise((resolve, reject) => { resolve(wgs) }) }
+      repoMock.getCategories = () => { return new Promise((resolve, reject) => { resolve(cas) }) }
+      repoMock.getDurations = () => { return new Promise((resolve, reject) => { resolve(durs) }) }
+
+      const res = timerecordsService.getMainModel('mail1@ds.dsf')
+
+      expect(res).to.eventually.eql({
+        workingGroups: wgs,
+        categories: cas,
+        durations: durs,
+        currentDay: new Date().getDate(),
+        currentMonth: new Date().getMonth() + 1,
+        currentYear: new Date().getFullYear(),
+        timeRecords: timerecordsService.getGroupedByMonth([r1, r2])
+      })
     })
   })
 })
