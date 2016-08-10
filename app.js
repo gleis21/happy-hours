@@ -52,7 +52,9 @@ const accessLogStream = fs.createWriteStream(path.join(__dirname, './logs/access
   flags: 'a'
 })
 
-app.use(helmet())
+app.use(helmet({
+  frameguard: false
+}))
 app.use(morgan('combined', {
   stream: accessLogStream
 }))
