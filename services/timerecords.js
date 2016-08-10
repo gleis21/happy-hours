@@ -7,6 +7,7 @@ module.exports = function (repo) {
       const getWorkingGroups = repo.getWorkingGroups()
       const getCategories = repo.getCategories()
       const getDurations = repo.getDurations()
+      
       Promise.all([getWorkingGroups, getCategories, getDurations, getTimeRecords]).then(values => {
         const model = {
           workingGroups: values[0],
