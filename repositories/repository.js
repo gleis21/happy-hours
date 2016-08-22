@@ -96,7 +96,7 @@ function deleteRowById (id) {
     .then(d => getSheet(d, 0))
     .then(sheet => getRowsByColumn(sheet, 'guid', id, '='))
     .then(rows => {
-      if (rows.length >= 1) throw new Error('More then one element with id: ' + id)
+      if (rows.length > 1) throw new Error('More then one element with id: ' + id)
       if (rows.length === 0) throw new Error('Could not find element with id: ' + id)
       deleteRow(rows[0])
     })
