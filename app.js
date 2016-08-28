@@ -16,6 +16,9 @@ const fs = require('fs')
 const redis = require('redis')
 const RedisStore = require('connect-redis')(session)
 const cacheMiddlewareFactory = require('./middleware/cache')
+// include and initialize the rollbar library with your access token
+const rollbar = require('rollbar')
+rollbar.init(process.env.ROLLBAR_ACCESS_TOKEN)
 
 passport.use(new Strategy({
   clientID: process.env.CLIENT_ID,
@@ -109,7 +112,7 @@ app.get('/timerecords',
       timerecordService.getMainModel(email).then((model) => {
         redisClient.setnx(email, JSON.stringify(model))
         res.render('index', model)
-      }).catch(e => next(e))
+      })
     }
   })
 
@@ -118,7 +121,7 @@ app.post('/timerecords/:id/delete',
   cacheMiddleware.clear,
   function (req, res, next) {
     const id = req.body.id
-    repo.deleteRowById(id).then(() => res.redirect('/timerecords')).catch(e => next(e))
+    repo.deleteRowById(id).then(() => res.redirect('/timerecords'))
   })
 
 app.post('/timerecords/add',
@@ -137,7 +140,7 @@ app.post('/timerecords/add',
     const day = req.body.timerecord.day
 
     const newRecord = new TimeRecord(id, email, username, duration, category, workinggroup, description, year, month, day)
-    repo.addNewTimeRecord(newRecord).then(() => res.redirect('/timerecords')).catch(e => next(e))
+    repo.addNewTimeRecord(newRecord).then(() => res.redirect('/timerecords'))
   })
 
 // error handlers
@@ -162,5 +165,8 @@ app.use(function (err, req, res, next) {
     error: {}
   })
 })
+
+app.use(rollbar.handleUncaughtExceptionsAndRejections(process.env.ROLLBAR_ACCESS_TOKEN))
+rollbar.reportMessage('Handlers configured')
 
 module.exports = app

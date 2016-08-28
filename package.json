@@ -26,7 +26,8 @@
     "node-uuid": "^1.4.7",
     "passport": "^0.3.2",
     "passport-google-oauth20": "^1.0.0",
-    "redis": "^2.6.2"
+    "redis": "^2.6.2",
+    "rollbar": "^0.6.2"
   },
   "devDependencies": {
     "eslint": "^3.2.2",
