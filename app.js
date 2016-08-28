@@ -166,7 +166,7 @@ app.use(function (err, req, res, next) {
   })
 })
 
-app.use(rollbar.handleUncaughtExceptionsAndRejections(process.env.ROLLBAR_ACCESS_TOKEN))
+rollbar.handleUncaughtExceptionsAndRejections(process.env.ROLLBAR_ACCESS_TOKEN)
 rollbar.reportMessage('Handlers configured')
 
 module.exports = app
