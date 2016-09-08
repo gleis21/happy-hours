@@ -112,7 +112,7 @@ app.get('/timerecords',
       timerecordService.getMainModel(email).then((model) => {
         redisClient.setnx(email, JSON.stringify(model))
         res.render('index', model)
-      })
+      }).catch(e => next(e))
     }
   })
 
@@ -121,7 +121,7 @@ app.post('/timerecords/:id/delete',
   cacheMiddleware.clear,
   function (req, res, next) {
     const id = req.body.id
-    repo.deleteRowById(id).then(() => res.redirect('/timerecords'))
+    repo.deleteRowById(id).then(() => res.redirect('/timerecords')).catch(e => next(e))
   })
 
 app.post('/timerecords/add',
@@ -140,33 +140,13 @@ app.post('/timerecords/add',
     const day = req.body.timerecord.day
 
     const newRecord = new TimeRecord(id, email, username, duration, category, workinggroup, description, year, month, day)
-    repo.addNewTimeRecord(newRecord).then(() => res.redirect('/timerecords'))
+    repo.addNewTimeRecord(newRecord).then(() => res.redirect('/timerecords')).catch(e => next(e))
   })
 
-// error handlers
-// development error handler
-// will print stacktrace
-if (app.get('env') === 'development') {
-  app.use(function (err, req, res, next) {
-    res.status(err.status || 500)
-    res.render('error', {
-      message: err.message,
-      error: err
-    })
-  })
-}
-
-// production error handler
-// no stacktraces leaked to user
-app.use(function (err, req, res, next) {
-  res.status(err.status || 500)
-  res.render('error', {
-    message: err.message,
-    error: {}
-  })
+app.get('/status', (req, res) => {
+  res.send('OK')
 })
 
-rollbar.handleUncaughtExceptionsAndRejections(process.env.ROLLBAR_ACCESS_TOKEN)
-rollbar.reportMessage('Handlers configured')
+app.use(rollbar.errorHandler(process.env.ROLLBAR_ACCESS_TOKEN))
 
 module.exports = app
