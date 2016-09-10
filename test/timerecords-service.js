@@ -42,8 +42,7 @@ describe('Timerecords Service', function () {
     it('combines all the data into a single object', function () {
       const r1 = new TimeRecord('guid1', 'mail1@ds.dsf', 'firstname1 lastname1', 4, 'category1', 'working group 1', 'bla1', 2016, 6, 1)
       const r2 = new TimeRecord('guid2', 'mail1@ds.dsf', 'firstname2 lastname2', 5, 'category2', 'working group 2', 'bla2', 2016, 8, 1)
-      const r3 = new TimeRecord('guid3', 'mail2@ds.dsf', 'firstname3 lastname3', 5, 'category2', 'working group 2', 'bla2', 2016, 8, 1)
-      const timerecords = [r1, r2, r3]
+      const timerecords = [r1, r2]
       const wgs = [{wg: 'working group 1'}, {wg: 'working group 2'}]
       const cas = [{ca: 'category1'}, {ca: 'category2'}]
       const durs = [{duration: 1}, {duration: 2}]
@@ -55,14 +54,14 @@ describe('Timerecords Service', function () {
 
       const res = timerecordsService.getMainModel('mail1@ds.dsf')
 
-      expect(res).to.eventually.eql({
+      return expect(res).to.eventually.eql({
         workingGroups: wgs,
         categories: cas,
         durations: durs,
         currentDay: new Date().getDate(),
         currentMonth: new Date().getMonth() + 1,
         currentYear: new Date().getFullYear(),
-        timeRecords: timerecordsService.getGroupedByMonth([r1, r2])
+        timeRecords: timerecordsService.getGroupedByMonth(timerecords)
       })
     })
   })
