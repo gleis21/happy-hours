@@ -46,6 +46,7 @@ module.exports = function (repo) {
 
     return _.orderBy(res, x => { return new Date(x.monthDate) }, 'desc')
   }
+
   return {
     getMainModel: getMainModel,
     getGroupedByMonth: getGroupedByMonth

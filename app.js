@@ -143,8 +143,10 @@ app.post('/timerecords/add',
     repo.addNewTimeRecord(newRecord).then(() => res.redirect('/timerecords')).catch(e => next(e))
   })
 
-app.get('/status', (req, res) => {
-  res.send('OK')
+app.get('/status', (req, res, next) => {
+  timerecordService.getMainModel('test@test.com').then((model) => {
+    res.status(200).end()
+  }).catch(e => res.status(500).end())
 })
 
 app.use(rollbar.errorHandler(process.env.ROLLBAR_ACCESS_TOKEN))
