@@ -133,7 +133,6 @@ app.get('/alltimerecords',
 
       var $ = cheerio.load(dilbertWebsite)
       var dilbertOfTheDayImgUrl = $('img.img-responsive.img-comic').attr('src')
-      console.log(dilbertOfTheDayImgUrl)
       model.dilbertOfTheDayImgUrl = dilbertOfTheDayImgUrl
       res.render('timerecords', model)
     }).catch(e => next(e))
