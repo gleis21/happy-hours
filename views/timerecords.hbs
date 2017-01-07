@@ -1,0 +1,144 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-12">
+      <br/>
+      <div class="alert alert-success" role="alert">
+        Wir haben schon insgesamt in diesem Jahr stolze <strong>{{sum}}</strong> Happy-Hours gemacht!
+      </div>
+      <div class="alert alert-success" role="alert">
+        Daily Dilbert:
+        <br/>  
+        <img src="{{dilbertOfTheDayImgUrl}}"/>
+      </div>
+      <br/>
+      <div id="accordion" role="tablist" aria-multiselectable="true">
+        {{#each timerecordsPerUser}}
+        <div class="card">
+          <div class="card-header" role="tab" id="{{this.id}}1">
+            <h5 class="mb-0">
+              <a data-toggle="collapse" data-parent="#accordion" href="#{{this.id}}" aria-controls="{{this.id}}">
+                {{this.user}}
+              </a>
+            </h5>
+          </div>
+
+          <div id="{{this.id}}" class="collapse" role="tabpanel" aria-labelledby="{{this.id}}1">
+            <div class="card-block">
+              {{#each this.timeRecords}}
+              <div class="card card-block">
+                <div class="alert alert-success" role="alert">
+                  <strong>Wow!</strong> {{../user}} hat in dem Monat ganze <strong>{{this.durationSum}}</strong> Stunden gemacht!
+                </div>
+                <br/>
+                <div class="table-responsive">
+                  <table class="table table-striped">
+                    <thead class="thead-inverse">
+                      <tr>
+                        <th>Bewohner*in</th>
+                        <th>Dauer</th>
+                        <th>Kategorie</th>
+                        <th>AG</th>
+                        <th>Beschreibung</th>
+                        <th>Jahr</th>
+                        <th>Monat</th>
+                        <th>Tag</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {{#each this.records}}
+                      <tr>
+                        <td>{{this.userName}}</td>
+                        <td>{{this.duration}}</td>
+                        <td>{{this.category}}</td>
+                        <td>{{this.workingGroup}}</td>
+                        <td>{{this.description}}</td>
+                        <td>{{this.year}}</td>
+                        <td>{{this.month}}</td>
+                        <td>{{this.day}}</td>
+                      </tr>
+                      {{/each}}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              {{/each}}
+            </div>
+          </div>
+        </div>
+        {{/each}}
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{{#each timeRecords}}
+<div class="card card-block">
+  <div class="alert alert-success" role="alert">
+    <strong>Wow!</strong> Du hast in dem Monat ganze <strong>{{this.durationSum}}</strong> Stunden gemacht!
+  </div>
+  <br/>
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead class="thead-inverse">
+        <tr>
+          <th>Bewohner*in</th>
+          <th>Dauer</th>
+          <th>Kategorie</th>
+          <th>AG</th>
+          <th>Beschreibung</th>
+          <th>Jahr</th>
+          <th>Monat</th>
+          <th>Tag</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each this.records}}
+        <tr>
+          <td>{{this.userName}}</td>
+          <td>{{this.duration}}</td>
+          <td>{{this.category}}</td>
+          <td>{{this.workingGroup}}</td>
+          <td>{{this.description}}</td>
+          <td>{{this.year}}</td>
+          <td>{{this.month}}</td>
+          <td>{{this.day}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+</div>
+{{/each}}
+
+</div>
+</div>
+</div>

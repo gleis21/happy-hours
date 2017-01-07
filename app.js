@@ -14,6 +14,9 @@ const timerecordService = require('./services/timerecords')(repo)
 const helmet = require('helmet')
 const fs = require('fs')
 const redis = require('redis')
+const request = require('request-promise-native')
+const moment = require('moment')
+const cheerio = require('cheerio')
 const RedisStore = require('connect-redis')(session)
 const cacheMiddlewareFactory = require('./middleware/cache')
 // include and initialize the rollbar library with your access token
@@ -26,8 +29,8 @@ passport.use(new Strategy({
   callbackURL: process.env.CALLBACK_URL
 },
   function (accessToken, refreshToken, profile, cb) {
-    repo.getAuthorizedEmailAccounts().then(authEmails => {
-      const foundEmail = authEmails.find(e => e === profile.emails[0].value)
+    repo.getAuthorizedUsers().then(authenticatedUsers => {
+      const foundEmail = authenticatedUsers.find(e => e.email === profile.emails[0].value)
       if (foundEmail) return cb(null, profile)
       else return cb(new Error('User not found!'), null)
     })
@@ -102,10 +105,13 @@ app.get('/auth/google/callback',
 
 app.get('/timerecords',
   ensureAuth.ensureLoggedIn('/'),
-  cacheMiddleware.getIfExists,
+  cacheMiddleware.getSignedUserTimeRecordsIfExists,
   function (req, res, next) {
     if (req.cachedData) {
       const model = req.cachedData
+      model.currentDay = new Date().getDate()
+      model.currentMonth = new Date().getMonth() + 1
+      model.currentYear = new Date().getFullYear()
       res.render('index', model)
     } else {
       const email = req.user.emails[0].value
@@ -114,6 +120,23 @@ app.get('/timerecords',
         res.render('index', model)
       }).catch(e => next(e))
     }
+  })
+
+app.get('/alltimerecords',
+  ensureAuth.ensureLoggedIn('/'),
+  function (req, res, next) {
+    const getAllUsersTimeRecords = timerecordService.getAllUsersTimeRecords()
+    const getDilbertStrip = request('http://dilbert.com/strip/' + moment().format('DD-MM-YYYY'))
+    Promise.all([getAllUsersTimeRecords, getDilbertStrip]).then(values => {
+      const model = values[0]
+      const dilbertWebsite = values[1]
+
+      var $ = cheerio.load(dilbertWebsite)
+      var dilbertOfTheDayImgUrl = $('img.img-responsive.img-comic').attr('src')
+      console.log(dilbertOfTheDayImgUrl)
+      model.dilbertOfTheDayImgUrl = dilbertOfTheDayImgUrl
+      res.render('timerecords', model)
+    }).catch(e => next(e))
   })
 
 app.post('/timerecords/:id/delete',

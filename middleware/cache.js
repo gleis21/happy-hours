@@ -1,6 +1,6 @@
 module.exports = function (redisClient) {
   return {
-    getIfExists: function getIfExists (req, res, next) {
+    getSignedUserTimeRecordsIfExists: function getIfExists (req, res, next) {
       const email = req.user.emails[0].value
       redisClient.exists(email, (err, exists) => {
         if (!err && exists) {

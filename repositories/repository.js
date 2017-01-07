@@ -58,11 +58,18 @@ module.exports = function (serviceAccountKey, spreadsheetId) {
     })
   }
 
-  function getAuthorizedEmailAccounts () {
+  function getAuthorizedUsers () {
     return authenticate(doc)
       .then((d) => getSheet(d, 4))
       .then(sheet => getRowsByColumn(sheet))
-      .then(rows => rows.map(r => r.email))
+      .then(rows => rows.map(r => { return { email: r.email, name: r.name } }))
+  }
+
+  function getAllUsersTimeRecords () {
+    return authenticate(doc)
+      .then((d) => getSheet(d, 0))
+      .then(sheet => getRowsByColumn(sheet))
+      .then(rows => rows.map(r => new TimeRecord(r.guid, r.email, r.username, r.duration, r.category, r.workinggroup, r.description, r.year, r.month, r.day)))
   }
 
   function getTimeRecordsByEmail (email) {
@@ -111,7 +118,8 @@ module.exports = function (serviceAccountKey, spreadsheetId) {
   }
 
   return {
-    getAuthorizedEmailAccounts: getAuthorizedEmailAccounts,
+    getAuthorizedUsers: getAuthorizedUsers,
+    getAllUsersTimeRecords: getAllUsersTimeRecords,
     getTimeRecordsByEmail: getTimeRecordsByEmail,
     deleteRowById: deleteRowById,
     getCategories: getCategories,

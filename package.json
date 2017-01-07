@@ -10,6 +10,7 @@
     "body-parser": "~1.15.1",
     "chai": "^3.5.0",
     "chai-as-promised": "^5.3.0",
+    "cheerio": "^0.22.0",
     "connect-ensure-login": "^0.1.1",
     "connect-redis": "^3.1.0",
     "cookie-parser": "~1.4.3",
@@ -22,11 +23,14 @@
     "helmet": "^2.1.2",
     "lodash": "^4.13.1",
     "mocha": "^3.0.0",
+    "moment": "^2.17.1",
     "morgan": "~1.7.0",
     "node-uuid": "^1.4.7",
     "passport": "^0.3.2",
     "passport-google-oauth20": "^1.0.0",
     "redis": "^2.6.2",
+    "request": "^2.79.0",
+    "request-promise-native": "^1.0.3",
     "rollbar": "^0.6.2"
   },
   "devDependencies": {
