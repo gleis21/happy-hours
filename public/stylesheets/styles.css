@@ -1,3 +1,11 @@
 form{
-  font-size: 1.3em;
+  font-size: 2em;
+}
+
+.form-control {
+  font-size: 2rem;
+}
+
+select.form-control:not([size]):not([multiple]) {
+    height: calc(3.25rem + 2px);
 }
