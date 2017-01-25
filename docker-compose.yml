@@ -1,6 +1,10 @@
 version: '2'
 services:
-    happy-hours:
+    happy-hours-gleis:
+        image: gleis21/happy-hours:latest
+        links:
+            - redis
+    happy-hours-gm:
         image: gleis21/happy-hours:latest
         links:
             - redis

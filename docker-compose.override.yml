@@ -1,11 +1,21 @@
 version: '2'
 services:
-    happy-hours:
+    happy-hours-gleis:
         build: .
         expose:
             - "3000"
         volumes:
             - .:/usr/src/app
+        environment:
+            - CONFIG=gleis
+    happy-hours-gm:
+        build: .
+        expose:
+            - "3030"
+        volumes:
+            - .:/usr/src/app
+        environment:
+            - CONFIG=gm
     proxy:
         image: zzrot/alpine-caddy
         ports:

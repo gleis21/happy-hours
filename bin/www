@@ -3,7 +3,13 @@
 /**
  * Module dependencies.
  */
-require('dotenv').config({path: './config/.env'});
+let path = ''
+if(process.env.CONFIG == 'gleis') {
+  path = './config/gleis/.env'
+} else if(process.env.CONFIG == 'gm') {
+  path = './config/gm/.env'
+}
+require('dotenv').config({path: path});
 var app = require('../app');
 var debug = require('debug')('happy-hours:server');
 var http = require('http');

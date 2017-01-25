@@ -1,4 +1,4 @@
-require('dotenv').config({path: './config/.env'})
+require('dotenv').config({path: './config/gleis/.env'})
 
 const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised')

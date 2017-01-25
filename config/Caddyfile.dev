@@ -1,3 +1,8 @@
 localhost:3000 {
-				proxy / happy-hours:3000
+				proxy /gleis happy-hours-gleis:3000 {
+					without /gleis
+				}
+				proxy /gm happy-hours-gm:3030 {
+					without /gm
+				}
 }
