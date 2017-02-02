@@ -21,6 +21,7 @@ const RedisStore = require('connect-redis')(session)
 const cacheMiddlewareFactory = require('./middleware/cache')
 // include and initialize the rollbar library with your access token
 const rollbar = require('rollbar')
+
 rollbar.init(process.env.ROLLBAR_ACCESS_TOKEN)
 
 passport.use(new Strategy({
@@ -30,7 +31,8 @@ passport.use(new Strategy({
 },
   function (accessToken, refreshToken, profile, cb) {
     repo.getAuthorizedUsers().then(authenticatedUsers => {
-      const foundEmail = authenticatedUsers.find(e => e.email === profile.emails[0].value)
+      const profileEmailAdrs = profile.emails.map(adr => adr.value)
+      const foundEmail = authenticatedUsers.find(e => profileEmailAdrs.find(adr => adr === e.email))
       if (foundEmail) return cb(null, profile)
       else return cb(new Error('User not found!'), null)
     })
