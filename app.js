@@ -31,11 +31,12 @@ passport.use(new Strategy({
 },
   function (accessToken, refreshToken, profile, cb) {
     repo.getAuthorizedUsers().then(authenticatedUsers => {
-      // const profileEmailAdrs = profile.emails.map(adr => adr.value)
-      // const foundEmail = authenticatedUsers.find(e => profileEmailAdrs.find(adr => adr === e.email))
-      // if (foundEmail)
-      return cb(null, profile)
-      // else return cb(new Error('User not found!'), null)
+      const foundEmail = authenticatedUsers.find(e => profile.emails[0].value === e.email)
+      if (foundEmail) {
+        return cb(null, profile)
+      } else {
+        return cb(new Error('User not found!'), null)
+      }
     })
   }))
 

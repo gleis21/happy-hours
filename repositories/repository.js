@@ -62,7 +62,7 @@ module.exports = function (serviceAccountKey, spreadsheetId) {
     return authenticate(doc)
       .then((d) => getSheet(d, 4))
       .then(sheet => getRowsByColumn(sheet))
-      .then(rows => rows.map(r => { return { email: r.email, name: r.name } }))
+      .then(rows => rows.map(r => { return { email: r.email.trim(), name: r.name.trim() } }))
   }
 
   function getAllUsersTimeRecords () {
