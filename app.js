@@ -130,14 +130,8 @@ app.get('/alltimerecords',
   ensureAuth.ensureLoggedIn('/'),
   function (req, res, next) {
     const getAllUsersTimeRecords = timerecordService.getAllUsersTimeRecords()
-    const getDilbertStrip = request('http://dilbert.com/strip/' + moment().format('DD-MM-YYYY'))
-    Promise.all([getAllUsersTimeRecords, getDilbertStrip]).then(values => {
+    Promise.all([getAllUsersTimeRecords]).then(values => {
       const model = values[0]
-      const dilbertWebsite = values[1]
-
-      var $ = cheerio.load(dilbertWebsite)
-      var dilbertOfTheDayImgUrl = $('img.img-responsive.img-comic').attr('src')
-      model.dilbertOfTheDayImgUrl = dilbertOfTheDayImgUrl
       res.render('timerecords', model)
     }).catch(e => next(e))
   })
