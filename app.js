@@ -129,11 +129,12 @@ app.get('/timerecords',
 app.get('/alltimerecords',
   ensureAuth.ensureLoggedIn('/'),
   function (req, res, next) {
-    const getAllUsersTimeRecords = timerecordService.getAllUsersTimeRecords()
+    /*const getAllUsersTimeRecords = timerecordService.getAllUsersTimeRecords()
     Promise.all([getAllUsersTimeRecords]).then(values => {
       const model = values[0]
       res.render('timerecords', model)
-    }).catch(e => next(e))
+    }).catch(e => next(e))*/
+    res.send('test')
   })
 
 app.post('/timerecords/:id/delete',
