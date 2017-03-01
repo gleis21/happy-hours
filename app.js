@@ -134,7 +134,7 @@ app.get('/alltimerecords',
       const model = values[0]
       res.render('timerecords', model)
     }).catch(e => next(e))*/
-    res.send('test')
+    res.send('test2')
   })
 
 app.post('/timerecords/:id/delete',
