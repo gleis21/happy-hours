@@ -14,9 +14,6 @@ const timerecordService = require('./services/timerecords')(repo)
 const helmet = require('helmet')
 const fs = require('fs')
 const redis = require('redis')
-const request = require('request-promise-native')
-const moment = require('moment')
-const cheerio = require('cheerio')
 const RedisStore = require('connect-redis')(session)
 const cacheMiddlewareFactory = require('./middleware/cache')
 // include and initialize the rollbar library with your access token
@@ -129,9 +126,13 @@ app.get('/timerecords',
 app.get('/alltimerecords',
   ensureAuth.ensureLoggedIn('/'),
   function (req, res, next) {
-    timerecordService.getAllUsersTimeRecords().then(model => {
-      res.render('timerecords', model)
+    repo.getAllUsersTimeRecords().then(model => {
+      res.send(JSON.stringify(model))
     }).catch(e => next(e))
+    // timerecordService.getAllUsersTimeRecords().then(model => {
+      // redisClient.setex('all_time_records', JSON.stringify(model), 24 * 60 * 60)
+      // res.render('timerecords', model)
+    // }).catch(e => next(e))
   })
 
 app.post('/timerecords/:id/delete',
