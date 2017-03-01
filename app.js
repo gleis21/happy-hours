@@ -126,13 +126,10 @@ app.get('/timerecords',
 app.get('/alltimerecords',
   ensureAuth.ensureLoggedIn('/'),
   function (req, res, next) {
-    repo.getAllUsersTimeRecords().then(model => {
-      res.send(JSON.stringify(model))
-    }).catch(e => next(e))
-    // timerecordService.getAllUsersTimeRecords().then(model => {
+    timerecordService.getAllUsersTimeRecords().then(model => {
       // redisClient.setex('all_time_records', JSON.stringify(model), 24 * 60 * 60)
-      // res.render('timerecords', model)
-    // }).catch(e => next(e))
+      res.render('timerecords', model)
+    }).catch(e => next(e))
   })
 
 app.post('/timerecords/:id/delete',

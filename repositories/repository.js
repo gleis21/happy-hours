@@ -68,7 +68,7 @@ module.exports = function (serviceAccountKey, spreadsheetId) {
   function getAllUsersTimeRecords () {
     return authenticate(doc)
       .then((d) => getSheet(d, 0))
-      .then(sheet => getRowsByColumn(sheet))
+      .then(sheet => getRowsByColumn(sheet, 'email', 'p.marcinkowski83@gmail.com', '='))
       .then(rows => rows.map(r => new TimeRecord(r.guid, r.email, r.username, r.duration, r.category, r.workinggroup, r.description, r.year, r.month, r.day)))
   }
 
