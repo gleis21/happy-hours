@@ -21,40 +21,18 @@ module.exports = function (repo) {
       }).catch(e => reject(e))
     })
   }
-  function getAllUsersTimeRecords () {
+  function getAllUsersTimeRecords (email) {
     return new Promise((resolve, reject) => {
       const getAuthUsers = repo.getAuthorizedUsers()
-      const getTimeRecords = repo.getAllUsersTimeRecords()
+      const getTimeRecords = repo.getTimeRecordsByEmail(email)
       Promise.all([getAuthUsers, getTimeRecords]).then(values => {
         const authorisedUsers = _.orderBy(values[0], u => u.name)
         const currentYear = new Date().getFullYear()
-        const timerecords = _.filter(values[1], r => parseInt(r.year) === currentYear)
-        const recordsGroupedByEmail = _.groupBy(timerecords, record => record.email)
-        const timerecordsByEmail = _.orderBy(_.map(recordsGroupedByEmail, (userRows, email) => {
-          return {
-            email: email,
-            timeRecords: getGroupedByMonth(userRows)
-          }
-        }), x => x.email)
-        const hash = _.keyBy(timerecordsByEmail, 'email')
-        const timerecordsPerUser = _.map(authorisedUsers, u => {
-          const temp = hash[u.email]
-          if (temp) {
-            temp.id = _.camelCase(u.name)
-            temp.user = u.name
-            return temp
-          }
-          return {
-            id: _.camelCase(u.name),
-            user: u.name,
-            email: u.email,
-            timeRecords: []
-          }
-        })
-        const sum = _.reduce(timerecords, (sum, r) => { return sum + parseFloat(r.duration) }, 0)
+        const timerecords = getGroupedByMonth(_.filter(values[1], r => parseInt(r.year) === currentYear))
+        
         resolve({
-          timerecordsPerUser: timerecordsPerUser,
-          sum: sum
+          authorisedUsers: authorisedUsers,
+          timerecords: timerecords
         })
       }).catch(e => reject(e))
     })

@@ -123,11 +123,14 @@ app.get('/timerecords',
     }
   })
 
-app.get('/alltimerecords',
+app.get('/alltimerecords/:email?',
   ensureAuth.ensureLoggedIn('/'),
   function (req, res, next) {
-    timerecordService.getAllUsersTimeRecords().then(model => {
-      // redisClient.setex('all_time_records', JSON.stringify(model), 24 * 60 * 60)
+    let email = req.params.email
+    if (!email) {
+      email = req.user.emails[0].value
+    }
+    timerecordService.getAllUsersTimeRecords(email).then(model => {
       res.render('timerecords', model)
     }).catch(e => next(e))
   })
