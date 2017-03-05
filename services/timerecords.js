@@ -1,12 +1,13 @@
 const _ = require('lodash')
 
-module.exports = function (repo) {
-  function getMainModel (email) {
+
+module.exports = function (repo, cacheService) {
+  function getMainPageViewModel (email, workingGroups, categories, durations) {
     return new Promise((resolve, reject) => {
       const getTimeRecords = repo.getTimeRecordsByEmail(email)
-      const getWorkingGroups = repo.getWorkingGroups()
-      const getCategories = repo.getCategories()
-      const getDurations = repo.getDurations()
+      const getWorkingGroups = cacheService.getWorkingGroups()
+      const getCategories = cacheService.getCategories()
+      const getDurations = cacheService.getDurations()
       Promise.all([getWorkingGroups, getCategories, getDurations, getTimeRecords]).then(values => {
         const model = {
           workingGroups: values[0],
@@ -15,56 +16,64 @@ module.exports = function (repo) {
           currentDay: new Date().getDate(),
           currentMonth: new Date().getMonth() + 1,
           currentYear: new Date().getFullYear(),
-          timeRecords: getGroupedByMonth(values[3])
+          timeRecords: getMonthRecordsSections(values[3])
         }
         resolve(model)
       }).catch(e => reject(e))
     })
   }
-  function getAllUsersTimeRecords (email) {
+  function getAllUsersRecordsPageViewModel (email) {
     return new Promise((resolve, reject) => {
-      const getAuthUsers = repo.getAuthorizedUsers()
+      const getAuthUsers = cacheService.getAuthorizedUsers()
       const getTimeRecords = repo.getTimeRecordsByEmail(email)
       Promise.all([getAuthUsers, getTimeRecords]).then(values => {
-        const authorisedUsers = _.orderBy(values[0], u => u.name)
-        const currentYear = new Date().getFullYear()
-        const timerecords = getGroupedByMonth(_.filter(values[1], r => parseInt(r.year) === currentYear))
-        
         resolve({
-          authorisedUsers: authorisedUsers,
-          timerecords: timerecords
+          authorisedUsers: _.orderBy(values[0], u => u.name),
+          timerecords: _.flow([filterCurrentYearRecords, getMonthRecordsSections])(values[1])
         })
       }).catch(e => reject(e))
     })
   }
-  function getGroupedByMonth (timerecords) {
-    const recordsGroupedByMonth = _.groupBy(timerecords, record => {
+
+  function filterCurrentYearRecords (records) {
+    const currentYear = new Date().getFullYear()
+    return _.filter(records, r => parseInt(r.year) === currentYear)
+  }
+
+  function groupByMonth (timerecords) {
+    return _.groupBy(timerecords, record => {
       const y = record.year
       const m = record.month - 1
 
       return new Date(y, m, 1)
     })
+  }
 
-    const res = _.map(recordsGroupedByMonth, (rowsByMonth, key) => {
-      return {
-        monthDate: key,
-        records: _.orderBy(rowsByMonth, r => {
-          const y = r.year
-          const m = r.month - 1
-          const d = r.day
+  function getMonthRecordsSection (monthsRecords, month) {
+    return {
+      monthDate: month,
+      records: _.orderBy(monthsRecords, r => {
+        const y = r.year
+        const m = r.month - 1
+        const d = r.day
 
-          return new Date(y, m, d)
-        }, 'desc'),
-        durationSum: _.reduce(rowsByMonth, (sum, r) => { return sum + parseFloat(r.duration) }, 0)
-      }
-    })
+        return new Date(y, m, d)
+      }, 'desc'),
+      durationSum: _.reduce(monthsRecords, (sum, r) => { return sum + parseFloat(r.duration) }, 0)
+    }
+  }
 
-    return _.orderBy(res, x => { return new Date(x.monthDate) }, 'desc')
+  function orderMonthSectionsByMonth (sections) {
+    return _.orderBy(sections, x => { return new Date(x.monthDate) }, 'desc')
+  }
+
+  function getMonthRecordsSections (records) {
+    return _.flow([groupByMonth, (groups) => _.map(groups, getMonthRecordsSection), orderMonthSectionsByMonth])(records)
   }
 
   return {
-    getMainModel: getMainModel,
-    getAllUsersTimeRecords: getAllUsersTimeRecords,
-    getGroupedByMonth: getGroupedByMonth
+    getMainPageViewModel: getMainPageViewModel,
+    getAllUsersRecordsPageViewModel: getAllUsersRecordsPageViewModel,
+    getMonthRecordsSections: getMonthRecordsSections
   }
 }

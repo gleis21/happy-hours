@@ -9,13 +9,17 @@ const TimeRecord = require('./models/time-record').TimeRecord
 const session = require('express-session')
 const ensureAuth = require('connect-ensure-login')
 const uuid = require('node-uuid')
-const repo = require('./repositories/repository')(process.env.SERVICE_ACCOUNT_KEY, process.env.SPREADSHEET_ID)
-const timerecordService = require('./services/timerecords')(repo)
+
 const helmet = require('helmet')
 const fs = require('fs')
 const redis = require('redis')
+const redisClient = redis.createClient({
+  host: 'redis'
+})
+const repo = require('./repositories/repository')(process.env.SERVICE_ACCOUNT_KEY, process.env.SPREADSHEET_ID)
+const cacheService = require('./services/cacheService')(repo, redisClient)
+const timerecordService = require('./services/timerecords')(repo, cacheService)
 const RedisStore = require('connect-redis')(session)
-const cacheMiddlewareFactory = require('./middleware/cache')
 // include and initialize the rollbar library with your access token
 const rollbar = require('rollbar')
 
@@ -44,10 +48,6 @@ passport.serializeUser(function (user, cb) {
 passport.deserializeUser(function (obj, cb) {
   cb(null, obj)
 })
-const redisClient = redis.createClient({
-  host: 'redis'
-})
-const cacheMiddleware = cacheMiddlewareFactory(redisClient)
 
 // Create a new Express application.
 var app = express()
@@ -106,21 +106,11 @@ app.get('/auth/google/callback',
 
 app.get('/timerecords',
   ensureAuth.ensureLoggedIn('/'),
-  cacheMiddleware.getSignedUserTimeRecordsIfExists,
   function (req, res, next) {
-    if (req.cachedData) {
-      const model = req.cachedData
-      model.currentDay = new Date().getDate()
-      model.currentMonth = new Date().getMonth() + 1
-      model.currentYear = new Date().getFullYear()
+    const email = req.user.emails[0].value
+    timerecordService.getMainPageViewModel(email).then((model) => {
       res.render('index', model)
-    } else {
-      const email = req.user.emails[0].value
-      timerecordService.getMainModel(email).then((model) => {
-        redisClient.setnx(email, JSON.stringify(model))
-        res.render('index', model)
-      }).catch(e => next(e))
-    }
+    }).catch(e => next(e))
   })
 
 app.get('/alltimerecords/:email?',
@@ -130,14 +120,13 @@ app.get('/alltimerecords/:email?',
     if (!email) {
       email = req.user.emails[0].value
     }
-    timerecordService.getAllUsersTimeRecords(email).then(model => {
+    timerecordService.getAllUsersRecordsPageViewModel(email).then(model => {
       res.render('timerecords', model)
     }).catch(e => next(e))
   })
 
 app.post('/timerecords/:id/delete',
   ensureAuth.ensureLoggedIn('/'),
-  cacheMiddleware.clear,
   function (req, res, next) {
     const id = req.body.id
     repo.deleteRowById(id).then(() => res.redirect('/timerecords')).catch(e => next(e))
@@ -145,7 +134,6 @@ app.post('/timerecords/:id/delete',
 
 app.post('/timerecords/add',
   ensureAuth.ensureLoggedIn('/'),
-  cacheMiddleware.clear,
   function (req, res, next) {
     const id = uuid.v4().toString()
     const email = req.user.emails[0].value

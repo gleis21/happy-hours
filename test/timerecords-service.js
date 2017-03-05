@@ -2,7 +2,8 @@ const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised')
 const expect = chai.expect
 const repoMock = {}
-const timerecordsService = require('../services/timerecords')(repoMock)
+const cacheMock = {}
+const timerecordsService = require('../services/timerecords')(repoMock, cacheMock)
 const TimeRecord = require('../models/time-record').TimeRecord
 
 chai.use(chaiAsPromised)
@@ -17,7 +18,7 @@ describe('Timerecords Service', function () {
       const r5 = new TimeRecord(null, null, null, 2.5, null, null, null, 2016, 7, 9)
       const timerecords = [r1, r2, r3, r4, r5]
 
-      const res = timerecordsService.getGroupedByMonth(timerecords)
+      const res = timerecordsService.getMonthRecordsSections(timerecords)
 
       expect(new Date(res[0].monthDate).getMonth()).to.equal(6)
       expect(new Date(res[1].monthDate).getMonth()).to.equal(5)
@@ -31,7 +32,7 @@ describe('Timerecords Service', function () {
       const r5 = new TimeRecord(null, null, null, 2.5, null, null, null, 2016, 7, 9)
       const timerecords = [r1, r2, r3, r4, r5]
 
-      const res = timerecordsService.getGroupedByMonth(timerecords)
+      const res = timerecordsService.getMonthRecordsSections(timerecords)
 
       expect(res[0].durationSum).to.equal(8.5)
       expect(res[1].durationSum).to.equal(10)
@@ -48,11 +49,11 @@ describe('Timerecords Service', function () {
       const durs = [{duration: 1}, {duration: 2}]
 
       repoMock.getTimeRecordsByEmail = (email) => { return new Promise((resolve, reject) => { resolve(timerecords) }) }
-      repoMock.getWorkingGroups = () => { return new Promise((resolve, reject) => { resolve(wgs) }) }
-      repoMock.getCategories = () => { return new Promise((resolve, reject) => { resolve(cas) }) }
-      repoMock.getDurations = () => { return new Promise((resolve, reject) => { resolve(durs) }) }
+      cacheMock.getWorkingGroups = () => { return new Promise((resolve, reject) => { resolve(wgs) }) }
+      cacheMock.getCategories = () => { return new Promise((resolve, reject) => { resolve(cas) }) }
+      cacheMock.getDurations = () => { return new Promise((resolve, reject) => { resolve(durs) }) }
 
-      const res = timerecordsService.getMainModel('mail1@ds.dsf')
+      const res = timerecordsService.getMainPageViewModel('mail1@ds.dsf')
 
       return expect(res).to.eventually.eql({
         workingGroups: wgs,
@@ -61,7 +62,7 @@ describe('Timerecords Service', function () {
         currentDay: new Date().getDate(),
         currentMonth: new Date().getMonth() + 1,
         currentYear: new Date().getFullYear(),
-        timeRecords: timerecordsService.getGroupedByMonth(timerecords)
+        timeRecords: timerecordsService.getMonthRecordsSections(timerecords)
       })
     })
   })
