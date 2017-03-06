@@ -9,15 +9,12 @@ const TimeRecord = require('./models/time-record').TimeRecord
 const session = require('express-session')
 const ensureAuth = require('connect-ensure-login')
 const uuid = require('node-uuid')
-
 const helmet = require('helmet')
 const fs = require('fs')
 const redis = require('redis')
-const redisClient = redis.createClient({
-  host: 'redis'
-})
+const redisClient = redis.createClient({ host: 'redis' })
 const repo = require('./repositories/repository')(process.env.SERVICE_ACCOUNT_KEY, process.env.SPREADSHEET_ID)
-const cacheService = require('./services/cacheService')(repo, redisClient)
+const cacheService = require('./services/cache')(repo, redisClient)
 const timerecordService = require('./services/timerecords')(repo, cacheService)
 const RedisStore = require('connect-redis')(session)
 // include and initialize the rollbar library with your access token
@@ -108,9 +105,14 @@ app.get('/timerecords',
   ensureAuth.ensureLoggedIn('/'),
   function (req, res, next) {
     const email = req.user.emails[0].value
-    timerecordService.getMainPageViewModel(email).then((model) => {
-      res.render('index', model)
-    }).catch(e => next(e))
+    Promise.all([timerecordService.getFormViewModel(), timerecordService.getUserRecordsViewModel(email)])
+      .then(values => {
+        const model = {
+          formModel: values[0],
+          timeRecords: values[1]
+        }
+        res.render('index', model)
+      }).catch(e => next(e))
   })
 
 app.get('/alltimerecords/:email?',
@@ -120,9 +122,14 @@ app.get('/alltimerecords/:email?',
     if (!email) {
       email = req.user.emails[0].value
     }
-    timerecordService.getAllUsersRecordsPageViewModel(email).then(model => {
-      res.render('timerecords', model)
-    }).catch(e => next(e))
+    Promise.all([timerecordService.getAuthorizedUsers(), timerecordService.getCurrentYearUserRecords(email)])
+      .then(values => {
+        const model = {
+          authorisedUsers: values[0],
+          timerecords: values[1]
+        }
+        res.render('timerecords', model)
+      }).catch(e => next(e))
   })
 
 app.post('/timerecords/:id/delete',
@@ -151,7 +158,7 @@ app.post('/timerecords/add',
   })
 
 app.get('/status', (req, res, next) => {
-  timerecordService.getMainModel('test@test.com').then((model) => {
+  timerecordService.getUserRecordsViewModel('test@test.com').then((model) => {
     res.status(200).end()
   }).catch(e => res.status(500).end())
 })

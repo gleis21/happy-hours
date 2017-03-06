@@ -39,30 +39,39 @@ describe('Timerecords Service', function () {
     })
   })
 
-  describe('getting the main page model', function () {
+  describe('getting the user time records view model', function () {
     it('combines all the data into a single object', function () {
       const r1 = new TimeRecord('guid1', 'mail1@ds.dsf', 'firstname1 lastname1', 4, 'category1', 'working group 1', 'bla1', 2016, 6, 1)
       const r2 = new TimeRecord('guid2', 'mail1@ds.dsf', 'firstname2 lastname2', 5, 'category2', 'working group 2', 'bla2', 2016, 8, 1)
       const timerecords = [r1, r2]
+
+      repoMock.getTimeRecordsByEmail = (email) => { return new Promise((resolve, reject) => { resolve(timerecords) }) }
+
+      const timeRecordsPromise = timerecordsService.getAllUserRecordsViewModel('mail1@ds.dsf')
+
+      return expect(timeRecordsPromise).to.eventually.eql(timerecordsService.getMonthRecordsSections(timerecords))
+    })
+  })
+
+  describe('getting form view model', function () {
+    it('combines all the data into a single object', function () {
       const wgs = [{wg: 'working group 1'}, {wg: 'working group 2'}]
       const cas = [{ca: 'category1'}, {ca: 'category2'}]
       const durs = [{duration: 1}, {duration: 2}]
 
-      repoMock.getTimeRecordsByEmail = (email) => { return new Promise((resolve, reject) => { resolve(timerecords) }) }
       cacheMock.getWorkingGroups = () => { return new Promise((resolve, reject) => { resolve(wgs) }) }
       cacheMock.getCategories = () => { return new Promise((resolve, reject) => { resolve(cas) }) }
       cacheMock.getDurations = () => { return new Promise((resolve, reject) => { resolve(durs) }) }
 
-      const res = timerecordsService.getMainPageViewModel('mail1@ds.dsf')
+      const formModelPromise = timerecordsService.getFormViewModel()
 
-      return expect(res).to.eventually.eql({
+      return expect(formModelPromise).to.eventually.eql({
         workingGroups: wgs,
         categories: cas,
         durations: durs,
         currentDay: new Date().getDate(),
         currentMonth: new Date().getMonth() + 1,
-        currentYear: new Date().getFullYear(),
-        timeRecords: timerecordsService.getMonthRecordsSections(timerecords)
+        currentYear: new Date().getFullYear()
       })
     })
   })

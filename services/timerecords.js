@@ -2,13 +2,20 @@ const _ = require('lodash')
 
 
 module.exports = function (repo, cacheService) {
-  function getMainPageViewModel (email, workingGroups, categories, durations) {
+  function getUserRecordsViewModel (email) {
     return new Promise((resolve, reject) => {
-      const getTimeRecords = repo.getTimeRecordsByEmail(email)
+      return repo.getTimeRecordsByEmail(email)
+      .then(records => resolve(getMonthRecordsSections(records)))
+      .catch(e => reject(e))
+    })
+  }
+
+  function getFormViewModel () {
+    return new Promise((resolve, reject) => {
       const getWorkingGroups = cacheService.getWorkingGroups()
       const getCategories = cacheService.getCategories()
       const getDurations = cacheService.getDurations()
-      Promise.all([getWorkingGroups, getCategories, getDurations, getTimeRecords]).then(values => {
+      Promise.all([getWorkingGroups, getCategories, getDurations]).then(values => {
         const model = {
           workingGroups: values[0],
           categories: values[1],
@@ -16,22 +23,25 @@ module.exports = function (repo, cacheService) {
           currentDay: new Date().getDate(),
           currentMonth: new Date().getMonth() + 1,
           currentYear: new Date().getFullYear(),
-          timeRecords: getMonthRecordsSections(values[3])
         }
         resolve(model)
       }).catch(e => reject(e))
     })
   }
-  function getAllUsersRecordsPageViewModel (email) {
+
+  function getAuthorizedUsers () {
     return new Promise((resolve, reject) => {
-      const getAuthUsers = cacheService.getAuthorizedUsers()
-      const getTimeRecords = repo.getTimeRecordsByEmail(email)
-      Promise.all([getAuthUsers, getTimeRecords]).then(values => {
-        resolve({
-          authorisedUsers: _.orderBy(values[0], u => u.name),
-          timerecords: _.flow([filterCurrentYearRecords, getMonthRecordsSections])(values[1])
-        })
-      }).catch(e => reject(e))
+      cacheService.getAuthorizedUsers()
+                  .then(users => resolve(_.orderBy(users, u => u.name)))
+                  .catch(e => reject(e))
+    })
+  }
+
+  function getCurrentYearUserRecords (email) {
+    return new Promise((resolve, reject) => {
+      repo.getTimeRecordsByEmail(email)
+          .then(records => resolve(_.flow([filterCurrentYearRecords, getMonthRecordsSections])(records)))
+          .catch(e => reject(e))
     })
   }
 
@@ -72,8 +82,10 @@ module.exports = function (repo, cacheService) {
   }
 
   return {
-    getMainPageViewModel: getMainPageViewModel,
-    getAllUsersRecordsPageViewModel: getAllUsersRecordsPageViewModel,
+    getFormViewModel: getFormViewModel,
+    getAuthorizedUsers: getAuthorizedUsers,
+    getUserRecordsViewModel: getUserRecordsViewModel,
+    getCurrentYearUserRecords: getCurrentYearUserRecords,
     getMonthRecordsSections: getMonthRecordsSections
   }
 }
