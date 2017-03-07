@@ -47,7 +47,7 @@ describe('Timerecords Service', function () {
 
       repoMock.getTimeRecordsByEmail = (email) => { return new Promise((resolve, reject) => { resolve(timerecords) }) }
 
-      const timeRecordsPromise = timerecordsService.getUserRecordsViewModel('mail1@ds.dsf')
+      const timeRecordsPromise = timerecordsService.getUserRecords('mail1@ds.dsf')
 
       return expect(timeRecordsPromise).to.eventually.eql(timerecordsService.getMonthRecordsSections(timerecords))
     })
