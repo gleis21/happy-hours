@@ -111,6 +111,7 @@ module.exports = function (serviceAccountKey, spreadsheetId) {
   }
 
   return {
+    spreadsheetId: spreadsheetId,
     getAuthorizedUsers: getAuthorizedUsers,
     getTimeRecordsByEmail: getTimeRecordsByEmail,
     deleteRowById: deleteRowById,

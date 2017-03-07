@@ -18,9 +18,10 @@ module.exports = function (repo, redisClient) {
 
   function getStaticData (key, promise) {
     return new Promise((resolve, reject) => {
-      redisClient.exists(key, (err, exists) => {
+      const k = repo.spreadsheetId + key
+      redisClient.exists(k, (err, exists) => {
         if (!err && exists) {
-          redisClient.get(key, (err, data) => {
+          redisClient.get(k, (err, data) => {
             if (!err) {
               const res = JSON.parse(data)
               resolve(res)
@@ -30,7 +31,7 @@ module.exports = function (repo, redisClient) {
           })
         } else {
           promise.then(res => {
-            redisClient.setex(key, 24 * 60 * 60, JSON.stringify(res))
+            redisClient.setex(k, 24 * 60 * 60, JSON.stringify(res))
             resolve(res)
           })
         }

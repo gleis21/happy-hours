@@ -105,7 +105,7 @@ app.get('/timerecords',
   ensureAuth.ensureLoggedIn('/'),
   function (req, res, next) {
     const email = req.user.emails[0].value
-    Promise.all([timerecordService.getFormViewModel(), timerecordService.getUserRecordsViewModel(email)])
+    Promise.all([timerecordService.getFormViewModel(), timerecordService.getUserRecords(email)])
       .then(values => {
         const model = {
           formModel: values[0],
@@ -158,7 +158,7 @@ app.post('/timerecords/add',
   })
 
 app.get('/status', (req, res, next) => {
-  timerecordService.getUserRecordsViewModel('test@test.com').then((model) => {
+  timerecordService.getUserRecords('test@test.com').then((model) => {
     res.status(200).end()
   }).catch(e => res.status(500).end())
 })

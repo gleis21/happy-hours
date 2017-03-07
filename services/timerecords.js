@@ -2,11 +2,11 @@ const _ = require('lodash')
 
 
 module.exports = function (repo, cacheService) {
-  function getUserRecordsViewModel (email) {
+  function getUserRecords (email) {
     return new Promise((resolve, reject) => {
       return repo.getTimeRecordsByEmail(email)
-      .then(records => resolve(getMonthRecordsSections(records)))
-      .catch(e => reject(e))
+                 .then(records => resolve(getMonthRecordsSections(records)))
+                 .catch(e => reject(e))
     })
   }
 
@@ -22,7 +22,7 @@ module.exports = function (repo, cacheService) {
           durations: values[2],
           currentDay: new Date().getDate(),
           currentMonth: new Date().getMonth() + 1,
-          currentYear: new Date().getFullYear(),
+          currentYear: new Date().getFullYear()
         }
         resolve(model)
       }).catch(e => reject(e))
@@ -62,15 +62,17 @@ module.exports = function (repo, cacheService) {
   function getMonthRecordsSection (monthsRecords, month) {
     return {
       monthDate: month,
-      records: _.orderBy(monthsRecords, r => {
-        const y = r.year
-        const m = r.month - 1
-        const d = r.day
-
-        return new Date(y, m, d)
-      }, 'desc'),
+      records: _.orderBy(monthsRecords, getDateFromRecord, 'desc'),
       durationSum: _.reduce(monthsRecords, (sum, r) => { return sum + parseFloat(r.duration) }, 0)
     }
+  }
+
+  function getDateFromRecord (record) {
+    const y = record.year
+    const m = record.month - 1
+    const d = record.day
+
+    return new Date(y, m, d)
   }
 
   function orderMonthSectionsByMonth (sections) {
@@ -84,7 +86,7 @@ module.exports = function (repo, cacheService) {
   return {
     getFormViewModel: getFormViewModel,
     getAuthorizedUsers: getAuthorizedUsers,
-    getUserRecordsViewModel: getUserRecordsViewModel,
+    getUserRecords: getUserRecords,
     getCurrentYearUserRecords: getCurrentYearUserRecords,
     getMonthRecordsSections: getMonthRecordsSections
   }
