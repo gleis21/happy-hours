@@ -14,7 +14,7 @@ module.exports = function(repo, cacheService) {
   function getFormViewModel(email) {
     return new Promise((resolve, reject) => {
       const getWorkingGroups = cacheService.getWorkingGroups();
-      const getCategories = cacheService.getCategories();
+      const getCategories = getCategoriesByEmail(email);
       const getDurations = cacheService.getDurations();
       Promise.all([getWorkingGroups, getCategories, getDurations])
         .then(values => {
@@ -66,8 +66,8 @@ module.exports = function(repo, cacheService) {
           const users = values[0]
           const cats = values[1]
 
-          const user = _.find(users, u => u.email == email)
-          const leaveApproved = moment().isSameOrAfter(moment(user.leaveForm)) && moment().isSameOrBefore(moment(user.leaveUntil));
+          const user = _.find(users, u => u.email === email)
+          const leaveApproved = moment().isSameOrAfter(moment(user.leaveFrom)) && moment().isSameOrBefore(moment(user.leaveUntil));
           const categories = _.filter(cats, x => x !== "Karenzierung vom Gleis 21" || leaveApproved)
           resolve(categories);
         })
@@ -133,7 +133,6 @@ module.exports = function(repo, cacheService) {
     getAuthorizedUsers: getAuthorizedUsers,
     getUserRecords: getUserRecords,
     getCurrentYearUserRecords: getCurrentYearUserRecords,
-    getMonthRecordsSections: getMonthRecordsSections,
-    getCategoriesByEmail: getCategoriesByEmail
+    getMonthRecordsSections: getMonthRecordsSections
   };
 };

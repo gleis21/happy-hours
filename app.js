@@ -8,7 +8,7 @@ const Strategy = require("passport-google-oauth20").Strategy;
 const TimeRecord = require("./models/time-record").TimeRecord;
 const session = require("express-session");
 const ensureAuth = require("connect-ensure-login");
-const uuid = require("node-uuid");
+const uuid = require("uuid/v4");
 const helmet = require("helmet");
 const fs = require("fs");
 const redis = require("redis");
@@ -56,7 +56,7 @@ app.get(
   function(req, res, next) {
     const email = req.user.emails[0].value;
     Promise.all([
-      timerecordService.getFormViewModel(),
+      timerecordService.getFormViewModel(email),
       timerecordService.getUserRecords(email)
     ])
       .then(values => {
