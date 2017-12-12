@@ -21,8 +21,8 @@ const cacheService = require("./services/cache")(repo, redisClient);
 const timerecordService = require("./services/timerecords")(repo, cacheService);
 const RedisStore = require("connect-redis")(session);
 // include and initialize the rollbar library with your access token
-const rollbar = require("rollbar");
-rollbar.init(process.env.ROLLBAR_ACCESS_TOKEN);
+var Rollbar = require('rollbar');
+var rollbar = new Rollbar(process.env.ROLLBAR_ACCESS_TOKEN);
 
 configureAuth();
 const app = configureApp();
@@ -148,7 +148,7 @@ app.get("/status", (req, res, next) => {
     .catch(e => res.status(500).end());
 });
 
-app.use(rollbar.errorHandler(process.env.ROLLBAR_ACCESS_TOKEN));
+app.use(rollbar.errorHandler());
 
 function configureAuth() {
   passport.use(

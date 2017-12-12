@@ -1,4 +1,5 @@
 const _ = require("lodash");
+const moment = require("moment");
 
 module.exports = function(repo, cacheService) {
   function getUserRecords(email) {
@@ -10,7 +11,7 @@ module.exports = function(repo, cacheService) {
     });
   }
 
-  function getFormViewModel() {
+  function getFormViewModel(email) {
     return new Promise((resolve, reject) => {
       const getWorkingGroups = cacheService.getWorkingGroups();
       const getCategories = cacheService.getCategories();
@@ -52,6 +53,24 @@ module.exports = function(repo, cacheService) {
               getMonthRecordsSections
             ])(records)
           ))
+        .catch(e => reject(e));
+    });
+  }
+
+  function getCategoriesByEmail(email) {
+    return new Promise((resolve, reject) => {
+      const getAuthorizedUsers = cacheService.getAuthorizedUsers();
+      const getCategories = cacheService.getCategories();
+      Promise.all([getAuthorizedUsers, getCategories])
+        .then(values => {
+          const users = values[0]
+          const cats = values[1]
+
+          const user = _.find(users, u => u.email == email)
+          const leaveApproved = moment().isSameOrAfter(moment(user.leaveForm)) && moment().isSameOrBefore(moment(user.leaveUntil));
+          const categories = _.filter(cats, x => x !== "Karenzierung vom Gleis 21" || leaveApproved)
+          resolve(categories);
+        })
         .catch(e => reject(e));
     });
   }
@@ -114,6 +133,7 @@ module.exports = function(repo, cacheService) {
     getAuthorizedUsers: getAuthorizedUsers,
     getUserRecords: getUserRecords,
     getCurrentYearUserRecords: getCurrentYearUserRecords,
-    getMonthRecordsSections: getMonthRecordsSections
+    getMonthRecordsSections: getMonthRecordsSections,
+    getCategoriesByEmail: getCategoriesByEmail
   };
 };

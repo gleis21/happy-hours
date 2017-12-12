@@ -69,7 +69,7 @@ module.exports = function(serviceAccountKey, spreadsheetId) {
       .then(sheet => getRowsByColumn(sheet))
       .then(rows =>
         rows.map(r => {
-          return { email: r.email.trim(), name: r.name.trim() };
+          return { email: r.email.trim(), name: r.name.trim(), leaveFrom: r.leaveFrom, leaveUntil: r.leaveUntil };
         }));
   }
 
