@@ -197,11 +197,47 @@ describe("Timerecords Service", function() {
   });
 
   describe("getting form view model", function() {
+    it("returns correct categories when leave not aproved", function() {
+      const cas = [{ ca: "category1" }, { ca: "category2" }, { ca: "Karenzierung vom Gleis 21" }];
+      const users = [{email: "user1@bla.com", leaveFrom: "1900-01-01", leaveUntil: "1900-01-01"}]
+
+      cacheMock.getCategories = () => {
+        return new Promise((resolve, reject) => {
+          resolve(cas);
+        });
+      };
+
+      cacheMock.getAuthorizedUsers = () => {
+        return new Promise((resolve, reject) => {
+          resolve(users);
+        });
+      };
+      const formModelPromise = timerecordsService.getCategoriesByEmail("user1@bla.com");
+      return expect(formModelPromise).to.eventually.eql(cas.slice(0, 2));
+    });
+    it("returns correct categories when leave aproved", function() {
+      const cas = [{ ca: "category1" }, { ca: "category2" }, { ca: "Karenzierung vom Gleis 21" }];
+      const users = [{email: "user1@bla.com", leaveFrom: "1900-01-01", leaveUntil: "2900-01-01"}]
+
+      cacheMock.getCategories = () => {
+        return new Promise((resolve, reject) => {
+          resolve(cas);
+        });
+      };
+
+      cacheMock.getAuthorizedUsers = () => {
+        return new Promise((resolve, reject) => {
+          resolve(users);
+        });
+      };
+      const formModelPromise = timerecordsService.getCategoriesByEmail("user1@bla.com");
+      return expect(formModelPromise).to.eventually.eql(cas);
+    });
     it("combines all the data into a single object", function() {
       const wgs = [{ wg: "working group 1" }, { wg: "working group 2" }];
-      const cas = [{ ca: "category1" }, { ca: "category2" }];
+      const cas = [{ ca: "category1" }, { ca: "category2" }, { ca: "Karenzierung vom Gleis 21" }];
       const durs = [{ duration: 1 }, { duration: 2 }];
-
+      const users = [{email: "user1@bla.com", leaveFrom: "1900-01-01", leaveUntil: "1900-01-01"}]
       cacheMock.getWorkingGroups = () => {
         return new Promise((resolve, reject) => {
           resolve(wgs);
@@ -217,12 +253,15 @@ describe("Timerecords Service", function() {
           resolve(durs);
         });
       };
-
-      const formModelPromise = timerecordsService.getFormViewModel();
-
+      cacheMock.getAuthorizedUsers = () => {
+        return new Promise((resolve, reject) => {
+          resolve(users);
+        });
+      };
+      const formModelPromise = timerecordsService.getFormViewModel("user1@bla.com");
       return expect(formModelPromise).to.eventually.eql({
         workingGroups: wgs,
-        categories: cas,
+        categories: cas.slice(0, 2),
         durations: durs,
         currentDay: new Date().getDate(),
         currentMonth: new Date().getMonth() + 1,

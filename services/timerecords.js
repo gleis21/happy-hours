@@ -68,7 +68,7 @@ module.exports = function(repo, cacheService) {
 
           const user = _.find(users, u => u.email === email)
           const leaveApproved = moment().isSameOrAfter(moment(user.leaveFrom)) && moment().isSameOrBefore(moment(user.leaveUntil));
-          const categories = _.filter(cats, x => x !== "Karenzierung vom Gleis 21" || leaveApproved)
+          const categories = _.filter(cats, x => x.ca !== "Karenzierung vom Gleis 21" || leaveApproved)
           resolve(categories);
         })
         .catch(e => reject(e));
@@ -133,6 +133,7 @@ module.exports = function(repo, cacheService) {
     getAuthorizedUsers: getAuthorizedUsers,
     getUserRecords: getUserRecords,
     getCurrentYearUserRecords: getCurrentYearUserRecords,
-    getMonthRecordsSections: getMonthRecordsSections
+    getMonthRecordsSections: getMonthRecordsSections,
+    getCategoriesByEmail: getCategoriesByEmail
   };
 };
