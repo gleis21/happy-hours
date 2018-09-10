@@ -198,7 +198,7 @@ describe("Timerecords Service", function() {
 
   describe("getting form view model", function() {
     it("returns correct categories when leave not aproved", function() {
-      const cas = [{ ca: "category1" }, { ca: "category2" }, { ca: "Karenzierung vom Gleis 21" }];
+      const cas = ["category1", "category2", "Karenzierung vom Gleis 21"];
       const users = [{email: "user1@bla.com", leaveFrom: "1900-01-01", leaveUntil: "1900-01-01"}]
 
       cacheMock.getCategories = () => {
@@ -216,7 +216,7 @@ describe("Timerecords Service", function() {
       return expect(formModelPromise).to.eventually.eql(cas.slice(0, 2));
     });
     it("returns correct categories when leave aproved", function() {
-      const cas = [{ ca: "category1" }, { ca: "category2" }, { ca: "Karenzierung vom Gleis 21" }];
+      const cas = ["category1", "category2", "Karenzierung vom Gleis 21"];
       const users = [{email: "user1@bla.com", leaveFrom: "1900-01-01", leaveUntil: "2900-01-01"}]
 
       cacheMock.getCategories = () => {
