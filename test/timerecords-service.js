@@ -234,9 +234,9 @@ describe("Timerecords Service", function() {
       return expect(formModelPromise).to.eventually.eql(cas);
     });
     it("combines all the data into a single object", function() {
-      const wgs = [{ wg: "working group 1" }, { wg: "working group 2" }];
-      const cas = [{ ca: "category1" }, { ca: "category2" }, { ca: "Karenzierung vom Gleis 21" }];
-      const durs = [{ duration: 1 }, { duration: 2 }];
+      const wgs = ["working group 1" , "working group 2" ];
+      const cas = ["category1", "category2", "Karenzierung vom Gleis 21"];
+      const durs = [1, 2 ];
       const users = [{email: "user1@bla.com", leaveFrom: "1900-01-01", leaveUntil: "1900-01-01"}]
       cacheMock.getWorkingGroups = () => {
         return new Promise((resolve, reject) => {
