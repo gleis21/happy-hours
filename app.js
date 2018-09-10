@@ -109,7 +109,7 @@ app.post(
   "/timerecords/add",
   ensureAuth.ensureLoggedIn("/"),
   function(req, res, next) {
-    const id = uuid.v4().toString();
+    const id = uuid().toString();
     const email = req.user.emails[0].value;
     const username = req.user.displayName;
     const duration = req.body.timerecord.duration;

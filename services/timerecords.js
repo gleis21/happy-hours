@@ -64,11 +64,11 @@ module.exports = function(repo, cacheService) {
       Promise.all([getAuthorizedUsers, getCategories])
         .then(values => {
           const users = values[0]
-          const cats = values[1]
+          const allCategories = values[1]
 
           const user = _.find(users, u => u.email === email)
           const leaveApproved = moment().isSameOrAfter(moment(user.leaveFrom)) && moment().isSameOrBefore(moment(user.leaveUntil));
-          const categories = _.filter(cats, x => x.ca !== "Karenzierung vom Gleis 21" || leaveApproved)
+          const categories = _.filter(allCategories, c => (c !== "Karenzierung vom Gleis 21") || leaveApproved)
           resolve(categories);
         })
         .catch(e => reject(e));
