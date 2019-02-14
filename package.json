@@ -20,7 +20,7 @@
     "express-session": "^1.15.6",
     "google-spreadsheet": "^2.0.7",
     "hbs": "^4.0.0",
-    "helmet": "^2.1.2",
+    "helmet": "^3.15.1",
     "lodash": "^4.17.11",
     "mocha": "^5.2.0",
     "moment": "^2.24.0",
