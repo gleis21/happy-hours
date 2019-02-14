@@ -7,7 +7,7 @@ services:
         volumes:
             - .:/usr/src/app
     proxy:
-        image: zzrot/alpine-caddy
+        image: adriel/caddy:0.10.13
         ports:
             -   "3000:3000"
         volumes:

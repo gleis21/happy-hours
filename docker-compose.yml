@@ -5,7 +5,7 @@ services:
         depends_on:
             - redis
     proxy:
-        image: zzrot/alpine-caddy
+        image: adriel/caddy:0.10.13
         depends_on:
             - happy-hours
     redis:
