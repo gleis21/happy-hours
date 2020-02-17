@@ -4,4 +4,4 @@ Happy-Hours
 
 **Was ist das?**
 
-Simple Zeiterfassung für soziokratisch organisierte Baugruppen.
+Simple Zeiterfassung für soziokratisch organisierte Baugruppen
