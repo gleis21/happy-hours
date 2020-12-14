@@ -1,4 +1,4 @@
-name: Deploy to VPS
+name: Publish container image
 
 on: 
   workflow_dispatch:
