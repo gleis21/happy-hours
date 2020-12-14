@@ -1,4 +1,5 @@
-module.exports = function(repo, redisClient) {
+module.exports = function (repo, map) {
+
   function getWorkingGroups() {
     return getStaticData("working_groups", repo.getWorkingGroups());
   }
@@ -18,23 +19,15 @@ module.exports = function(repo, redisClient) {
   function getStaticData(key, promise) {
     return new Promise((resolve, reject) => {
       const k = repo.spreadsheetId + key;
-      redisClient.exists(k, (err, exists) => {
-        if (!err && exists) {
-          redisClient.get(k, (err, data) => {
-            if (!err) {
-              const res = JSON.parse(data);
-              resolve(res);
-            } else {
-              reject(err);
-            }
-          });
-        } else {
-          promise.then(res => {
-            redisClient.setex(k, 24 * 60 * 60, JSON.stringify(res));
-            resolve(res);
-          });
-        }
-      });
+      if (map.has(k)) {
+        const res = JSON.parse(data);
+        resolve(res);
+      } else {
+        promise.then(res => {
+          map[k] = JSON.stringify(res)
+          resolve(res);
+        });
+      }
     });
   }
 

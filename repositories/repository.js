@@ -1,139 +1,127 @@
-const fs = require("fs");
-const GoogleSpreadsheet = require("google-spreadsheet");
-const TimeRecord = require("../models/time-record").TimeRecord;
+const fs = require('fs');
+const GoogleSpreadsheet = require('google-spreadsheet');
+const TimeRecord = require('../models/time-record').TimeRecord;
 
 module.exports = function(serviceAccountKey, spreadsheetId) {
   const serviceAccountCredentials = JSON.parse(
-    fs.readFileSync(serviceAccountKey, "utf8")
+    fs.readFileSync(serviceAccountKey, 'utf8')
   );
-  const doc = new GoogleSpreadsheet(spreadsheetId);
+  const doc = new GoogleSpreadsheet.GoogleSpreadsheet(spreadsheetId);
 
   function authenticate(gDocument) {
     return new Promise((resolve, reject) => {
-      gDocument.useServiceAccountAuth(serviceAccountCredentials, () => {
+      gDocument.useServiceAccountAuth(serviceAccountCredentials).then(() => {
         resolve(gDocument);
       });
     });
   }
 
-  function getSheet(gDocument, index) {
+  function getSheet(gDocument, title) {
     return new Promise((resolve, reject) => {
-      gDocument.getInfo((err, data) => {
-        if (err) reject(err);
-
-        resolve(data.worksheets[index]);
-      });
-    });
-  }
-
-  function getRowsByColumn(sheet, columnName, columnValue, comparisonSign) {
-    return new Promise((resolve, reject) => {
-      if (columnName && columnValue) {
-        const q = columnName + comparisonSign + '"' + columnValue + '"';
-        sheet.getRows(
-          {
-            query: q
-          },
-          (err, rows) => {
-            if (err) reject(err);
-            resolve(rows);
-          }
-        );
-      } else {
-        sheet.getRows({}, (err, rows) => {
-          if (err) reject(err);
-          resolve(rows);
-        });
-      }
+      gDocument.loadInfo().then(() => {
+        if (gDocument.sheetsByTitle[title]) {
+          resolve(gDocument.sheetsByTitle[title])
+        } else {
+          gDocument.addSheet({ title: title, headerValues: ['guid', 'email', 'userName', 'duration', 'category', 'workingGroup', 'description', 'year', 'month', 'day'] }).then(resolve);
+        }
+      }, (err)=> {
+        console.log(err)
+        reject(err);
+      })
     });
   }
 
   function addRow(sheet, row) {
     return new Promise((resolve, reject) => {
-      sheet.addRow(row, err => {
-        if (err) reject(err);
-        else resolve();
-      });
+      sheet.addRow(row).then(resolve, (err) => reject(err))
     });
   }
 
   function deleteRow(row) {
     return new Promise((resolve, reject) => {
-      row.del(resolve);
+      row.delete(resolve, reject);
     });
   }
 
   function getAuthorizedUsers() {
     return authenticate(doc)
-      .then(d => getSheet(d, 4))
-      .then(sheet => getRowsByColumn(sheet))
+      .then(d => getSheet(d, 'users'))
+      .then(sheet => sheet.getRows())
       .then(rows =>
         rows.map(r => {
-          return { email: r.email.trim(), name: r.name.trim(), leaveFrom: r.leavefrom.trim(), leaveUntil: r.leaveuntil.trim() };
-        }));
+          return {
+            email: r.email.trim(),
+            name: r.name.trim(),
+            leaveFrom: r.leaveFrom.trim(),
+            leaveUntil: r.leaveUntil.trim()
+          };
+        })
+      );
   }
 
   function getTimeRecordsByEmail(email) {
     return authenticate(doc)
-      .then(d => getSheet(d, 0))
-      .then(sheet => getRowsByColumn(sheet, "email", email, "="))
+      .then(d => getSheet(d, email))
+      .then(sheet => sheet.getRows())
       .then(rows =>
         rows.map(
           r =>
             new TimeRecord(
               r.guid,
               r.email,
-              r.username,
+              r.userName,
               r.duration,
               r.category,
-              r.workinggroup,
+              r.workingGroup,
               r.description,
               r.year,
               r.month,
               r.day
             )
-        ));
+        )
+      );
   }
 
   function getWorkingGroups() {
     return authenticate(doc)
-      .then(d => getSheet(d, 1))
-      .then(sheet => getRowsByColumn(sheet))
-      .then(rows => rows.map(r => r.wg));
+      .then(d => getSheet(d, "wg"))
+      .then(sheet => sheet.getRows())
+      .then(rows => rows.map(r => {
+        return r.wg;
+      }));
   }
 
   function getCategories() {
     return authenticate(doc)
-      .then(d => getSheet(d, 2))
-      .then(sheet => getRowsByColumn(sheet))
+      .then(d => getSheet(d, "cat"))
+      .then(sheet => sheet.getRows())
       .then(rows => rows.map(r => r.ca));
   }
 
   function getDurations() {
     return authenticate(doc)
-      .then(d => getSheet(d, 3))
-      .then(sheet => getRowsByColumn(sheet))
+      .then(d => getSheet(d, "dur"))
+      .then(sheet => sheet.getRows())
       .then(rows => rows.map(r => r.duration));
   }
 
-  function deleteRowById(id) {
+  function deleteRowById(email, id) {
     return authenticate(doc)
-      .then(d => getSheet(d, 0))
-      .then(sheet => getRowsByColumn(sheet, "guid", id, "="))
+      .then(d => getSheet(d, email))
+      .then(sheet => sheet.getRows())
       .then(rows => {
-        if (rows.length > 1) {
-          throw new Error("More then one element with id: " + id);
+        for (let index = 0; index < rows.length; index++) {
+          const r = rows[index];
+          if (r.guid.trim() === id) {
+            deleteRow(r)
+          }
         }
-        if (rows.length === 0) {
-          throw new Error("Could not find element with id: " + id);
-        }
-        deleteRow(rows[0]);
       });
   }
 
   function addNewTimeRecord(record) {
     return authenticate(doc)
-      .then(d => getSheet(d, 0))
+      .then(d => getSheet(d, record.email))
       .then(sheet => addRow(sheet, record));
   }
 

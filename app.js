@@ -11,15 +11,12 @@ const ensureAuth = require("connect-ensure-login");
 const uuid = require("uuid/v4");
 const helmet = require("helmet");
 const fs = require("fs");
-const redis = require("redis");
-const redisClient = redis.createClient({ host: "redis" });
 const repo = require("./repositories/repository")(
   process.env.SERVICE_ACCOUNT_KEY,
   process.env.SPREADSHEET_ID
 );
-const cacheService = require("./services/cache")(repo, redisClient);
+const cacheService = require("./services/cache")(repo, new Map());
 const timerecordService = require("./services/timerecords")(repo, cacheService);
-const RedisStore = require("connect-redis")(session);
 // include and initialize the rollbar library with your access token
 var Rollbar = require('rollbar');
 var rollbar = new Rollbar(process.env.ROLLBAR_ACCESS_TOKEN);
@@ -99,7 +96,7 @@ app.post(
   function(req, res, next) {
     const id = req.body.id;
     repo
-      .deleteRowById(id)
+      .deleteRowById(req.user.emails[0].value, id)
       .then(() => res.redirect("/timerecords"))
       .catch(e => next(e));
   }
@@ -140,6 +137,7 @@ app.post(
 );
 
 app.get("/status", (req, res, next) => {
+  //res.status(200).end();
   timerecordService
     .getUserRecords("test@test.com")
     .then(model => {
@@ -213,9 +211,6 @@ function configureApp() {
   );
   app.use(
     session({
-      store: new RedisStore({
-        client: redisClient
-      }),
       secret: process.env.SESSION_SECRET,
       resave: false,
       saveUninitialized: false,
