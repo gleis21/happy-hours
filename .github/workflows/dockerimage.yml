@@ -1,0 +1,26 @@
+name: Deploy to VPS
+
+on: 
+  workflow_dispatch:
+    inputs:
+      version:
+        description: HappyHours Version
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+ 
+    steps:
+    - uses: actions/checkout@v1 # may be actions/checkout@v2 now
+    - name: Login to DockerHub Registry
+      run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+    - name: Build the tagged Docker image
+      run: docker build . --file Dockerfile --tag gleis21/happy-hours:${{github.event.inputs.version}}
+    - name: Push the tagged Docker image
+      run: docker push gleis21/happy-hours:${{github.event.inputs.version}}
+    - name: Build the latest Docker image
+      run: docker build . --file Dockerfile --tag gleis21/happy-hours:latest
+    - name: Push the latest Docker image
+      run: docker push gleis21/happy-hours:latest
+   
