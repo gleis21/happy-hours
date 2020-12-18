@@ -24,34 +24,33 @@ var rollbar = new Rollbar(process.env.ROLLBAR_ACCESS_TOKEN);
 configureAuth();
 const app = configureApp();
 
-const router = express.Router();
 
 // Define routes.
-router.get("/", function(req, res, next) {
-  res.redirect("/auth/google");
+app.get("/", function(req, res, next) {
+  res.redirect("/hours/auth/google");
 });
 
-router.get(
+app.get(
   "/auth/google",
   passport.authenticate("google", {
     scope: "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email"
   })
 );
 
-router.get(
+app.get(
   "/auth/google/callback",
   passport.authenticate("google", {
-    failureRedirect: "/"
+    failureRedirect: "/hours"
   }),
   function(req, res) {
     // Successful authentication, redirect home.
-    res.redirect("/timerecords");
+    res.redirect("/hours/timerecords");
   }
 );
 
-router.get(
+app.get(
   "/timerecords",
-  ensureAuth.ensureLoggedIn("/"),
+  ensureAuth.ensureLoggedIn("/hours"),
   function(req, res, next) {
     const email = req.user.emails[0].value;
     Promise.all([
@@ -69,9 +68,9 @@ router.get(
   }
 );
 
-router.get(
+app.get(
   "/alltimerecords/:email?",
-  ensureAuth.ensureLoggedIn("/"),
+  ensureAuth.ensureLoggedIn("/hours"),
   function(req, res, next) {
     let email = req.params.email;
     if (!email) {
@@ -92,21 +91,21 @@ router.get(
   }
 );
 
-router.post(
+app.post(
   "/timerecords/:id/delete",
-  ensureAuth.ensureLoggedIn("/"),
+  ensureAuth.ensureLoggedIn("/hours"),
   function(req, res, next) {
     const id = req.body.id;
     repo
       .deleteRowById(req.user.emails[0].value, id)
-      .then(() => res.redirect("/timerecords"))
+      .then(() => res.redirect("/hours/timerecords"))
       .catch(e => next(e));
   }
 );
 
-router.post(
+app.post(
   "/timerecords/add",
-  ensureAuth.ensureLoggedIn("/"),
+  ensureAuth.ensureLoggedIn("/hours"),
   function(req, res, next) {
     const id = uuid().toString();
     const email = req.user.emails[0].value;
@@ -138,10 +137,15 @@ router.post(
   }
 );
 
-router.get("/healthz", (req, res, next) => {
+app.get("/healthz", (req, res, next) => {
   res.status(200).end();
+  // timerecordService
+  //   .getUserRecords("test@test.com")
+  //   .then(model => {
+  //     res.status(200).end();
+  //   })
+  //   .catch(e => res.status(500).end());
 });
-app.use('/hours', router);
 
 app.use(rollbar.errorHandler());
 
