@@ -27,7 +27,7 @@ const app = configureApp();
 
 // Define routes.
 app.get("/", function(req, res, next) {
-  res.redirect("./auth/google");
+  res.redirect("/hours/auth/google");
 });
 
 app.get(
@@ -44,13 +44,13 @@ app.get(
   }),
   function(req, res) {
     // Successful authentication, redirect home.
-    res.redirect("./timerecords");
+    res.redirect("/hours/timerecords");
   }
 );
 
 app.get(
   "/timerecords",
-  ensureAuth.ensureLoggedIn("./auth/google"),
+  ensureAuth.ensureLoggedIn("/hours/auth/google"),
   function(req, res, next) {
     const email = req.user.emails[0].value;
     Promise.all([
@@ -70,7 +70,7 @@ app.get(
 
 app.get(
   "/alltimerecords/:email?",
-  ensureAuth.ensureLoggedIn("./auth/google"),
+  ensureAuth.ensureLoggedIn("/hours/auth/google"),
   function(req, res, next) {
     let email = req.params.email;
     if (!email) {
@@ -93,19 +93,19 @@ app.get(
 
 app.post(
   "/timerecords/:id/delete",
-  ensureAuth.ensureLoggedIn("./auth/google"),
+  ensureAuth.ensureLoggedIn("/hours/auth/google"),
   function(req, res, next) {
     const id = req.body.id;
     repo
       .deleteRowById(req.user.emails[0].value, id)
-      .then(() => res.redirect("./timerecords"))
+      .then(() => res.redirect("/hours/timerecords"))
       .catch(e => next(e));
   }
 );
 
 app.post(
   "/timerecords/add",
-  ensureAuth.ensureLoggedIn("./auth/google"),
+  ensureAuth.ensureLoggedIn("/hours/auth/google"),
   function(req, res, next) {
     const id = uuid().toString();
     const email = req.user.emails[0].value;
@@ -132,7 +132,7 @@ app.post(
     );
     repo
       .addNewTimeRecord(newRecord)
-      .then(() => res.redirect("./timerecords"))
+      .then(() => res.redirect("/hours/timerecords"))
       .catch(e => next(e));
   }
 );
