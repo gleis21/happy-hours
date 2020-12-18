@@ -40,7 +40,7 @@ app.get(
 app.get(
   "/auth/google/callback",
   passport.authenticate("google", {
-    failureRedirect: "/hours"
+    failureMessage: "leider konntest du nicht authentifiziert werden"
   }),
   function(req, res) {
     // Successful authentication, redirect home.
@@ -50,7 +50,7 @@ app.get(
 
 app.get(
   "/timerecords",
-  ensureAuth.ensureLoggedIn("/hours"),
+  ensureAuth.ensureLoggedIn("/hours/auth/google"),
   function(req, res, next) {
     const email = req.user.emails[0].value;
     Promise.all([
@@ -70,7 +70,7 @@ app.get(
 
 app.get(
   "/alltimerecords/:email?",
-  ensureAuth.ensureLoggedIn("/hours"),
+  ensureAuth.ensureLoggedIn("/hours/auth/google"),
   function(req, res, next) {
     let email = req.params.email;
     if (!email) {
@@ -93,7 +93,7 @@ app.get(
 
 app.post(
   "/timerecords/:id/delete",
-  ensureAuth.ensureLoggedIn("/hours"),
+  ensureAuth.ensureLoggedIn("/hours/auth/google"),
   function(req, res, next) {
     const id = req.body.id;
     repo
@@ -105,7 +105,7 @@ app.post(
 
 app.post(
   "/timerecords/add",
-  ensureAuth.ensureLoggedIn("/hours"),
+  ensureAuth.ensureLoggedIn("/hours/auth/google"),
   function(req, res, next) {
     const id = uuid().toString();
     const email = req.user.emails[0].value;
