@@ -1,7 +1,7 @@
 <div class="container-fluid">
   <div class="row">
     <div class="col-sm-12">
-      <form action="/timerecords/add" method="post">
+      <form action="./timerecords/add" method="post">
         <fieldset class="form-group">
           <label for="duration">Wie lange:</label>
           <select class="form-control c-select" id="duration" name="timerecord[duration]">
@@ -79,7 +79,7 @@
               {{#each this.records}}
               <tr>
                 <td scope="row">
-                  <form action="/timerecords/{{this.guid}}/delete" method="post">
+                  <form action="./timerecords/{{this.guid}}/delete" method="post">
                     <input type="hidden" name="id" value="{{this.guid}}" />
                     <button type="submit" onclick="return confirm('Willst du das wirklich löschen?')"
                       class="btn btn-danger">
