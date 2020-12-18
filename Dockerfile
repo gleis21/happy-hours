@@ -7,6 +7,7 @@ WORKDIR /opt/src/app
 
 # Install app dependencies
 COPY package.json /opt/src/app/
+COPY package-lock.json /opt/src/app/
 RUN npm install
 
 # Bundle app source
