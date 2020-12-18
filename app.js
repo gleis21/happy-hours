@@ -24,19 +24,21 @@ var rollbar = new Rollbar(process.env.ROLLBAR_ACCESS_TOKEN);
 configureAuth();
 const app = configureApp();
 
+const router = express.Router();
+
 // Define routes.
-app.get("/", function(req, res, next) {
+router.get("/", function(req, res, next) {
   res.redirect("/auth/google");
 });
 
-app.get(
+router.get(
   "/auth/google",
   passport.authenticate("google", {
     scope: "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email"
   })
 );
 
-app.get(
+router.get(
   "/auth/google/callback",
   passport.authenticate("google", {
     failureRedirect: "/"
@@ -47,7 +49,7 @@ app.get(
   }
 );
 
-app.get(
+router.get(
   "/timerecords",
   ensureAuth.ensureLoggedIn("/"),
   function(req, res, next) {
@@ -67,7 +69,7 @@ app.get(
   }
 );
 
-app.get(
+router.get(
   "/alltimerecords/:email?",
   ensureAuth.ensureLoggedIn("/"),
   function(req, res, next) {
@@ -90,7 +92,7 @@ app.get(
   }
 );
 
-app.post(
+router.post(
   "/timerecords/:id/delete",
   ensureAuth.ensureLoggedIn("/"),
   function(req, res, next) {
@@ -102,7 +104,7 @@ app.post(
   }
 );
 
-app.post(
+router.post(
   "/timerecords/add",
   ensureAuth.ensureLoggedIn("/"),
   function(req, res, next) {
@@ -136,15 +138,10 @@ app.post(
   }
 );
 
-app.get("/status", (req, res, next) => {
-  //res.status(200).end();
-  timerecordService
-    .getUserRecords("test@test.com")
-    .then(model => {
-      res.status(200).end();
-    })
-    .catch(e => res.status(500).end());
+router.get("/healthz", (req, res, next) => {
+  res.status(200).end();
 });
+app.use('/hours', router);
 
 app.use(rollbar.errorHandler());
 
