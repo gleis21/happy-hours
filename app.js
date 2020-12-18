@@ -30,6 +30,10 @@ app.get("/", function(req, res, next) {
   res.redirect("/hours/auth/google");
 });
 
+app.get("", function(req, res, next) {
+  res.redirect("/hours/auth/google");
+});
+
 app.get(
   "/auth/google",
   passport.authenticate("google", {
