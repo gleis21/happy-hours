@@ -26,7 +26,7 @@ const app = configureApp();
 
 
 // Define routes.
-app.get("/", function(req, res, next) {
+app.get("/", function (req, res, next) {
   res.redirect("/hours/auth/google");
 });
 
@@ -42,7 +42,7 @@ app.get(
   passport.authenticate("google", {
     failureMessage: "leider konntest du nicht authentifiziert werden"
   }),
-  function(req, res) {
+  function (req, res) {
     // Successful authentication, redirect home.
     res.redirect("/hours/timerecords");
   }
@@ -51,7 +51,7 @@ app.get(
 app.get(
   "/timerecords",
   ensureAuth.ensureLoggedIn("/hours/auth/google"),
-  function(req, res, next) {
+  function (req, res, next) {
     const email = req.user.emails[0].value;
     Promise.all([
       timerecordService.getFormViewModel(email),
@@ -71,7 +71,7 @@ app.get(
 app.get(
   "/alltimerecords/:email?",
   ensureAuth.ensureLoggedIn("/hours/auth/google"),
-  function(req, res, next) {
+  function (req, res, next) {
     let email = req.params.email;
     if (!email) {
       email = req.user.emails[0].value;
@@ -94,7 +94,7 @@ app.get(
 app.post(
   "/timerecords/:id/delete",
   ensureAuth.ensureLoggedIn("/hours/auth/google"),
-  function(req, res, next) {
+  function (req, res, next) {
     const id = req.body.id;
     repo
       .deleteRowById(req.user.emails[0].value, id)
@@ -106,7 +106,7 @@ app.post(
 app.post(
   "/timerecords/add",
   ensureAuth.ensureLoggedIn("/hours/auth/google"),
-  function(req, res, next) {
+  function (req, res, next) {
     const id = uuid().toString();
     const email = req.user.emails[0].value;
     const username = req.user.displayName;
@@ -157,10 +157,18 @@ function configureAuth() {
         clientSecret: process.env.CLIENT_SECRET,
         callbackURL: process.env.CALLBACK_URL
       },
-      function(accessToken, refreshToken, profile, cb) {
+      function (accessToken, refreshToken, profile, cb) {
         repo.getAuthorizedUsers().then(authenticatedUsers => {
           const foundEmail = authenticatedUsers.find(
-            e => profile.emails[0].value === e.email
+            e => {
+              for (let index = 0; index < profile.emails.length; index++) {
+                const em = profile.emails[index];
+                if (value === e.email) {
+                  return true
+                }
+              }
+              return false;
+            }
           );
           if (foundEmail) {
             return cb(null, profile);
@@ -172,11 +180,11 @@ function configureAuth() {
     )
   );
 
-  passport.serializeUser(function(user, cb) {
+  passport.serializeUser(function (user, cb) {
     cb(null, user);
   });
 
-  passport.deserializeUser(function(obj, cb) {
+  passport.deserializeUser(function (obj, cb) {
     cb(null, obj);
   });
 }
