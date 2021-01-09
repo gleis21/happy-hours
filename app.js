@@ -163,7 +163,7 @@ function configureAuth() {
             e => {
               for (let index = 0; index < profile.emails.length; index++) {
                 const em = profile.emails[index];
-                if (value === e.email) {
+                if (em && em.value === e.email) {
                   return true
                 }
               }
