@@ -173,7 +173,8 @@ function configureAuth() {
           if (foundEmail) {
             return cb(null, profile);
           } else {
-            return cb(new Error("User not found!"), null);
+
+            return cb(new Error("User " + profile.emails[0].value + " is not authorized!"), null);
           }
         });
       }
