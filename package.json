@@ -23,7 +23,7 @@
     "helmet": "^3.21.3",
     "lodash": "^4.17.20",
     "mocha": "^5.2.0",
-    "moment": "^2.24.0",
+    "moment": "^2.29.4",
     "morgan": "^1.9.1",
     "passport": "^0.3.2",
     "passport-google-oauth20": "^1.0.0",
